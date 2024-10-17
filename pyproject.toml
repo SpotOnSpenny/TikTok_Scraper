@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "M2K_TikTok_Scraper"
+version = "0.0.1"
+authors = [
+    {name = "Spencer Fietz", email = "spencer.fietz@ucalgary.ca"}
+]
+description = "A package used in the M2K research projects to collect advertisements shown on TikTok"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Microsoft Windows",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Natural Language :: English",
+    "Development Status :: 1 - Planning"
+]
+
+dependencies = [
+    # Fill list as things get added
+    ]
+
+[project.scripts]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.exe"]
