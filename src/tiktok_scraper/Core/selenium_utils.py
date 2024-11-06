@@ -54,9 +54,8 @@ def search_for_ad(driver):
             ad_found = True
         else:
             print("No ad found at index: " + str(monitoring_data["data_index"]))
-            monitoring_data["data_index"] += 1
             time.sleep(5)
-            ActionChains(driver).key_down(Keys.ARROW_DOWN).key_up(Keys.ARROW_DOWN).perform()
+            next_video(driver)
 
 def check_for_ad(driver, data_index):
     tiktok = driver.find_element(By.ID, f"one-column-item-{data_index}")
@@ -65,6 +64,11 @@ def check_for_ad(driver, data_index):
         return True
     except:
         return False
+
+def next_video(driver):
+    global monitoring_data
+    ActionChains(driver).key_down(Keys.ARROW_DOWN).key_up(Keys.ARROW_DOWN).perform()
+    monitoring_data["data_index"] += 1
 
 # Test code below
 if __name__ == '__main__':
