@@ -1,10 +1,12 @@
 # Python Standard Library Dependencies
 import datetime
+import os
 
 # External Dependency Imports
 
 
 # Internal Dependency Imports
+from tiktok_scraper.Core.global_vars import monitoring_data
 from tiktok_scraper.Core.selenium_utils import start_webdriver, search_for_ad
 from tiktok_scraper.Core.processing import process_ad
 
@@ -13,6 +15,16 @@ from tiktok_scraper.Core.processing import process_ad
 #######################################################################################
 
 def scrape_tiktok():
+    # TODO - add support for custom output directory via environment variable
+    # Check for output dirs and create them if non_existent
+    src_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    output_dir = os.path.join(src_dir, "Output")
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+    else:
+        print("Output directory already exists! Please clear the directory before running the scraper.")
+        quit(1)
+
     # Initialize the scraper with user input
     valid_time = False
     while not valid_time:
@@ -47,10 +59,14 @@ def scrape_tiktok():
         else:
             print("Invalid demographic entered, please enter a relevant demographic.")
     
+    # Update the global variables with the demographic and location
+    monitoring_data["demographic"] = demographic
+    monitoring_data["location"] = vpn
+
     # Recursively scroll TikTok looking for ads until the designated time is up
     while datetime.datetime.now() < end_time:
         search_for_ad(driver)
-        process_ad(driver)
+        process_ad(driver, output_dir)
 
 
 

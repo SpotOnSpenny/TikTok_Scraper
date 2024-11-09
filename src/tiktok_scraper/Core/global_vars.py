@@ -12,7 +12,10 @@
 #######################################################################################
 
 monitoring_data = {
-    "data_index": 0
+    "demographic": "N/A",
+    "location": "N/A",
+    "data_index": 0,
+    "ads_found": 0
 }
 
 # Test code below

@@ -22,7 +22,8 @@ classifiers = [
 dependencies = [
     # Fill list as things get added
     "python-dotenv",
-    "selenium"
+    "selenium",
+    "opencv-python"
     ]
 
 [project.scripts]

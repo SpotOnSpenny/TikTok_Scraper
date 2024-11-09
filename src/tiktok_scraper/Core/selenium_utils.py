@@ -61,6 +61,7 @@ def check_for_ad(driver, data_index):
     tiktok = driver.find_element(By.ID, f"one-column-item-{data_index}")
     try:
         tiktok.find_element(By.XPATH, ".//*[contains(text(), 'ponsored')]")
+        monitoring_data["ads_found"] += 1
         return True
     except:
         return False
