@@ -45,13 +45,15 @@ def start_webdriver():
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
-def search_for_ad(driver):
+def search_for_ad(driver, data_lock):
     global monitoring_data
     ad_found = False
     while ad_found is False:
         if check_for_ad(driver, monitoring_data["data_index"]):
             print("Ad found at index: " + str(monitoring_data["data_index"]))
             ad_found = True
+            with data_lock:
+                monitoring_data["ads_this_log"] += 1
         else:
             print("No ad found at index: " + str(monitoring_data["data_index"]))
             time.sleep(5)
@@ -61,7 +63,6 @@ def check_for_ad(driver, data_index):
     tiktok = driver.find_element(By.ID, f"one-column-item-{data_index}")
     try:
         tiktok.find_element(By.XPATH, ".//*[contains(text(), 'ponsored')]")
-        monitoring_data["ads_found"] += 1
         return True
     except:
         return False

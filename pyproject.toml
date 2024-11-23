@@ -23,7 +23,8 @@ dependencies = [
     # Fill list as things get added
     "python-dotenv",
     "selenium",
-    "opencv-python"
+    "opencv-python",
+    "logging"
     ]
 
 [project.scripts]

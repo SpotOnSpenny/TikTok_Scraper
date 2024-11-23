@@ -1,6 +1,7 @@
 # Python Standard Library Dependencies
 import datetime
 import os
+import threading
 
 # External Dependency Imports
 
@@ -9,6 +10,7 @@ import os
 from tiktok_scraper.Core.global_vars import monitoring_data
 from tiktok_scraper.Core.selenium_utils import start_webdriver, search_for_ad
 from tiktok_scraper.Core.processing import process_ad
+from tiktok_scraper.Core.logger import start_logging
 
 #######################################################################################
 #                                        Notes:                                       #
@@ -16,6 +18,12 @@ from tiktok_scraper.Core.processing import process_ad
 
 def scrape_tiktok():
     # TODO - add support for custom output directory via environment variable
+    # TODO - make console portion of CLI prettier and more user friendly
+    # TODO - add better error handling for critical errors to log properly
+    # TODO - catch the KeyboardInterrupt exception and close the webdriver and threads properly
+    # TODO - collect the ad link, caption, posting account, etc. for each ad
+    # TODO - delete all images after processing to save space
+
     # Check for output dirs and create them if non_existent
     src_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     output_dir = os.path.join(src_dir, "Output")
@@ -62,11 +70,35 @@ def scrape_tiktok():
     # Update the global variables with the demographic and location
     monitoring_data["demographic"] = demographic
     monitoring_data["location"] = vpn
+    data_lock = threading.Lock()
+    stop_event = threading.Event()
+    error_event = threading.Event()
+
+    # Define and start the logging and scraping threads
+    try:
+        logging_thread = threading.Thread(target=start_logging, args = (f"{demographic}_{vpn}", stop_event, error_event, data_lock))
+        logging_thread.start()
+    except Exception as e:
+        print(e)
+        print("An error occurred while starting the logger. Exiting...")
+        quit(1)
 
     # Recursively scroll TikTok looking for ads until the designated time is up
-    while datetime.datetime.now() < end_time:
-        search_for_ad(driver)
-        process_ad(driver, output_dir)
+    try:
+        while datetime.datetime.now() < end_time:
+            search_for_ad(driver, data_lock)
+            process_ad(driver, output_dir)
+    except Exception as e:
+        print(e)
+        print("An error occurred while scraping TikTok. Exiting...")
+        error_event.set()
+        quit(1)
+
+    # Stop the logging thread and close the webdriver
+    stop_event.set()
+    logging_thread.join()
+    driver.quit()
+    print("Scraping complete. Please check the Output directory for the scraped ads.")
 
 
 

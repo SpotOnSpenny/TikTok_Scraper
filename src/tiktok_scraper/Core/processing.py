@@ -41,11 +41,8 @@ def process_ad(driver, output_dir):
     print(f"Total screenshots taken: {screenshot_count} for an ad length of {tiktok_length} seconds.")
     fps = screenshot_count / tiktok_length
     stitch_video(ad_folder, fps)
-    # Piece together screenshots into a video   
-    # Save the video to disk
     # If video is too big, push to cloud storage (S3? Google Drive?)
         # TODO - Check to see how big these videos are,
-        # TODO - separate the putting together of video and saving to disk and pushing it elsewhere into separate threads
     next_video(driver)
 
 def stitch_video(folder_name, fps):
