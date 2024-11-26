@@ -6,6 +6,7 @@ import queue
 
 # External Dependency Imports
 import pandas
+import boto3
 
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
@@ -33,10 +34,11 @@ def scrape_tiktok():
         print("Output directory already exists! Please clear the directory before running the scraper.")
         quit(1)
 
-    # Initialize the queue and spreadsheet for processing ads
+    # Initialize the queue and spreadsheet for processing ads, and s3 client for uploading videos
     processing_queue = queue.Queue()
     data_key = pandas.DataFrame(columns=["Ad ID", "Found at Index", "Demographic", "Location", "Ad Length", "CTA Link", "Caption", "Posting Account"])
     data_key.to_csv(os.path.join(output_dir, "Data Key.csv"), index=False)
+    s3_client = boto3.client("s3")
 
     # Initialize the scraper with user input
     valid_time = False
@@ -90,11 +92,13 @@ def scrape_tiktok():
 
     # Define and start the processing thread
     try:
-        processing_thread = threading.Thread(target=finish_processing, args = (stop_event, error_event, processing_queue, output_dir))
+        processing_thread = threading.Thread(target=finish_processing, args = (stop_event, error_event, processing_queue, output_dir, s3_client))
         processing_thread.start()
     except Exception as e:
         print(e)
         print("An error occurred while starting the processing thread. Exiting...")
+        error_event.set()
+        logging_thread.join()
         quit(1)
 
     # Recursively scroll TikTok looking for ads until the designated time is up
@@ -106,6 +110,8 @@ def scrape_tiktok():
         print(e)
         print("An error occurred while scraping TikTok. Exiting...")
         error_event.set()
+        logging_thread.join()
+        processing_thread.join()
         quit(1)
 
     # Stop the logging thread and close the webdriver

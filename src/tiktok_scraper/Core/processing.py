@@ -3,12 +3,15 @@ import datetime
 import time
 import os
 import io
+import shutil
 
 # External Dependency Imports
 from selenium.webdriver.common.by import By
 import cv2
 from bs4 import BeautifulSoup
 import pandas
+import boto3
+from dotenv import load_dotenv
 
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
@@ -33,14 +36,12 @@ def process_ad(driver, output_dir, data_lock, job_queue):
     tiktok_length = tiktok_length.split("/")[1].strip()
     tiktok_length = (int(tiktok_length.split(":")[0]) * 60) + int(tiktok_length.split(":")[1])
     end_time = datetime.datetime.now() + datetime.timedelta(seconds=tiktok_length)
-    print(f"Ad length: {tiktok_length} seconds")
 
-    # take screenshots of the ad (10x per second) until timer is over
+    # take screenshots of the ad until timer is over
     screenshot_count = 0
     while datetime.datetime.now() < end_time:
         tiktok_element.screenshot(f"{ad_folder}/{screenshot_count}.png")
         screenshot_count += 1
-    print(f"Total screenshots taken: {screenshot_count} for an ad length of {tiktok_length} seconds.")
     fps = screenshot_count / tiktok_length
     with data_lock:
         monitoring_data["ads_this_log"] += 1
@@ -56,10 +57,10 @@ def process_ad(driver, output_dir, data_lock, job_queue):
         })
     next_video(driver)
 
-def stitch_video(folder_name, fps):
+def stitch_video(folder_name, fps, ad_id):
     images = [img for img in os.listdir(folder_name) if img.endswith(".png")]
     images.sort(key=lambda x: int(x.split(".")[0]))
-    video_name = f"{folder_name}/{folder_name.split('/')[-1]}.mp4"
+    video_name = f"{folder_name}/{ad_id}.mp4"
     try:
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         frame = cv2.imread(os.path.join(folder_name, images[0]))
@@ -69,13 +70,14 @@ def stitch_video(folder_name, fps):
             video.write(cv2.imread(os.path.join(folder_name, image)))
         cv2.destroyAllWindows()
         video.release()
+        return(video_name)
     except Exception as e:
         print(e)
         print("Error creating video. Please check the images in the folder.")
         return
     
-
-def finish_processing(stop_event, error_event, job_queue, output_dir):
+# Function to save ad data in csv key, upload video to S3, and clean up output folder after upload
+def finish_processing(stop_event, error_event, job_queue, output_dir, s3_client):
     while not stop_event.is_set() and not error_event.is_set():
         try:
             ad_info = job_queue.get(block=True, timeout=30)
@@ -93,10 +95,15 @@ def finish_processing(stop_event, error_event, job_queue, output_dir):
                 "Caption": [caption],
                 "Posting Account": [posting_account]
             }).to_csv(os.path.join(output_dir, "Data Key.csv"), mode='a', header=False, index=False)
-            stitch_video(os.path.join(output_dir, ad_info[ad_id]), ad_info["fps"])
-        except:
+            video_path = stitch_video(os.path.join(output_dir, ad_info["folder_name"]), ad_info["fps"], ad_id)
+            s3_client = boto3.client("s3")
+            s3_client.upload_file(video_path, os.environ.get("S3_BUCKET"), f"{ad_id}.mp4")
+            shutil.rmtree(os.path.join(output_dir, ad_info["folder_name"]))
+            print(f"Ad {ad_id} processed, uploaded to S3, and removed from disk.")
+        except Exception as e:
+            print(e)
             continue
 
 # Test code below
 if __name__ == '__main__':
-    stitch_video("C:/Users/Spencer/Desktop/M2K/Code/TikTok_Scraper/src/Output/1_18m_Calgary", 3.0867)
+    pass

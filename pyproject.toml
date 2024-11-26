@@ -27,7 +27,8 @@ dependencies = [
     "logging",
     "ffmpeg", 
     "beautifulsoup4",
-    "pandas"
+    "pandas",
+    "boto3"
     ]
 
 [project.scripts]
