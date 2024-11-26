@@ -24,7 +24,10 @@ dependencies = [
     "python-dotenv",
     "selenium",
     "opencv-python",
-    "logging"
+    "logging",
+    "ffmpeg", 
+    "beautifulsoup4",
+    "pandas"
     ]
 
 [project.scripts]

@@ -2,14 +2,15 @@
 import datetime
 import os
 import threading
+import queue
 
 # External Dependency Imports
-
+import pandas
 
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
 from tiktok_scraper.Core.selenium_utils import start_webdriver, search_for_ad
-from tiktok_scraper.Core.processing import process_ad
+from tiktok_scraper.Core.processing import process_ad, finish_processing
 from tiktok_scraper.Core.logger import start_logging
 
 #######################################################################################
@@ -21,7 +22,6 @@ def scrape_tiktok():
     # TODO - make console portion of CLI prettier and more user friendly
     # TODO - add better error handling for critical errors to log properly
     # TODO - catch the KeyboardInterrupt exception and close the webdriver and threads properly
-    # TODO - collect the ad link, caption, posting account, etc. for each ad
     # TODO - delete all images after processing to save space
 
     # Check for output dirs and create them if non_existent
@@ -32,6 +32,11 @@ def scrape_tiktok():
     else:
         print("Output directory already exists! Please clear the directory before running the scraper.")
         quit(1)
+
+    # Initialize the queue and spreadsheet for processing ads
+    processing_queue = queue.Queue()
+    data_key = pandas.DataFrame(columns=["Ad ID", "Found at Index", "Demographic", "Location", "Ad Length", "CTA Link", "Caption", "Posting Account"])
+    data_key.to_csv(os.path.join(output_dir, "Data Key.csv"), index=False)
 
     # Initialize the scraper with user input
     valid_time = False
@@ -83,11 +88,20 @@ def scrape_tiktok():
         print("An error occurred while starting the logger. Exiting...")
         quit(1)
 
+    # Define and start the processing thread
+    try:
+        processing_thread = threading.Thread(target=finish_processing, args = (stop_event, error_event, processing_queue, output_dir))
+        processing_thread.start()
+    except Exception as e:
+        print(e)
+        print("An error occurred while starting the processing thread. Exiting...")
+        quit(1)
+
     # Recursively scroll TikTok looking for ads until the designated time is up
     try:
         while datetime.datetime.now() < end_time:
-            search_for_ad(driver, data_lock)
-            process_ad(driver, output_dir)
+            search_for_ad(driver)
+            process_ad(driver, output_dir, data_lock, processing_queue)
     except Exception as e:
         print(e)
         print("An error occurred while scraping TikTok. Exiting...")

@@ -56,13 +56,12 @@ def start_logging(profile, stop_event, error_event, data_lock):
                 break
             time.sleep(5)
         with data_lock:
-            logger.info(f"{monitoring_data['ads_this_log']} ads found in the last 15 minutes. Total ads found: {monitoring_data['ads_found'] + monitoring_data['ads_this_log']}")
-            monitoring_data["ads_found"] += monitoring_data["ads_this_log"]
+            logger.info(f"{monitoring_data['ads_this_log']} ads found in the last 15 minutes. Total ads found: {monitoring_data['ads_found']}")
             monitoring_data["ads_this_log"] = 0
     if error_event.is_set():
         logger.error("An error occurred during the scraping process. Exiting program, check console output for error.")
     else:
-        logger.info(f"Scraping process completed, found {monitoring_data["ads_found"]} ads. Exiting program.")
+        logger.info(f"Scraping process completed, found {monitoring_data['ads_found']} ads. Exiting program.")
 
 
 # Test code below

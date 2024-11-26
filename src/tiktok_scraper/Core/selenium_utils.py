@@ -42,18 +42,18 @@ def start_webdriver():
     options.add_argument(f"--user-data-dir={profile_dir}")
     options.add_argument(r"--profile-directory=Default")
     options.add_argument("--log-level=3")
+    #options.add_argument("--headless=new")
+    options.add_argument("--mute-audio")
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
-def search_for_ad(driver, data_lock):
+def search_for_ad(driver):
     global monitoring_data
     ad_found = False
     while ad_found is False:
         if check_for_ad(driver, monitoring_data["data_index"]):
             print("Ad found at index: " + str(monitoring_data["data_index"]))
             ad_found = True
-            with data_lock:
-                monitoring_data["ads_this_log"] += 1
         else:
             print("No ad found at index: " + str(monitoring_data["data_index"]))
             time.sleep(5)
