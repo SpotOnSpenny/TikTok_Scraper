@@ -48,7 +48,7 @@ def process_ad(driver, output_dir, data_lock, job_queue):
         monitoring_data["ads_found"] += 1
         job_queue.put({
             "folder_name": folder_name,
-            "page_dom": BeautifulSoup(driver.find_element(By.XPATH, f"//article[@data-index='{monitoring_data['data_index']}']").get_attribute("outerHTML"), "html.parser"),
+            "page_dom": BeautifulSoup(driver.find_element(By.XPATH, f"//article[@data-scroll-index='{monitoring_data['data_index']}']").get_attribute("outerHTML"), "html.parser"),
             "fps": fps,
             "found_at_index": monitoring_data["data_index"],
             "demographic": monitoring_data["demographic"],
