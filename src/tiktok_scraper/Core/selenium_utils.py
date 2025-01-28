@@ -71,6 +71,10 @@ def next_video(driver):
     global monitoring_data
     ActionChains(driver).key_down(Keys.ARROW_DOWN).key_up(Keys.ARROW_DOWN).perform()
     monitoring_data["data_index"] += 1
+    if monitoring_data["data_index"] == 100:
+        driver.refresh()
+        time.sleep(5)
+        monitoring_data["data_index"] = 0
 
 # Test code below
 if __name__ == '__main__':
