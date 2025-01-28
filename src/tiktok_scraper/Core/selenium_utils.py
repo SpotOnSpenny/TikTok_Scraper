@@ -59,12 +59,12 @@ def search_for_ad(driver):
             time.sleep(5)
             next_video(driver)
 
-def check_for_ad(driver, data_index, output_dir):
+def check_for_ad(driver, data_index):
     try:
         tiktok = driver.find_element(By.ID, f"one-column-item-{data_index}")
     except:
-        driver.take_screenshot(f"{output_dir}/error_{data_index}.png")
-        print("Error screenshot taken. Check output folder for details.")
+        refresh_page(driver)
+        return False
     try:
         tiktok.find_element(By.XPATH, ".//*[contains(text(), 'ponsored')]")
         return True
@@ -77,9 +77,12 @@ def next_video(driver):
     monitoring_data["data_index"] += 1
     monitoring_data["videos_watched"] += 1
     if monitoring_data["data_index"] == 100:
-        driver.refresh()
-        time.sleep(5)
-        monitoring_data["data_index"] = 0
+        refresh_page(driver)
+
+def refresh_page(driver):
+    driver.refresh()
+    time.sleep(5)
+    monitoring_data["data_index"] = 0
 
 # Test code below
 if __name__ == '__main__':
