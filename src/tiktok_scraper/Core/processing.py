@@ -27,7 +27,7 @@ def process_ad(driver, output_dir, data_lock, job_queue):
     ad_folder = os.path.join(output_dir, folder_name)
     os.mkdir(os.path.join(output_dir, folder_name))
 
-    # Check the length of the ad, and start timer
+    # Check the length of the ad, and start time
     tiktok_element = driver.find_element(By.ID, f"one-column-item-{monitoring_data['data_index']}")
     tiktok_length = "00:00 / 00:00"
     while tiktok_length == "00:00 / 00:00":

@@ -16,7 +16,8 @@ monitoring_data = {
     "location": "N/A",
     "data_index": 0,
     "ads_found": 0,
-    "ads_this_log": 0
+    "ads_this_log": 0,
+    "videos_watched": 1
 }
 
 # Test code below
