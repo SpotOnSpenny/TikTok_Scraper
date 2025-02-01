@@ -1,0 +1,8 @@
+python-dotenv
+selenium
+opencv-python
+logging
+ffmpeg 
+beautifulsoup4
+pandas
+boto3
