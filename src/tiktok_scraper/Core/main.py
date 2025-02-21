@@ -7,23 +7,27 @@ import queue
 # External Dependency Imports
 import pandas
 import boto3
+from dotenv import load_dotenv
 
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
 from tiktok_scraper.Core.selenium_utils import start_webdriver, search_for_ad
 from tiktok_scraper.Core.processing import process_ad, finish_processing
 from tiktok_scraper.Core.logger import start_logging
+from tiktok_scraper.Core.bluestacks import process_bluestacks_ad, find_bluestacks_ad, find_bluestacks_window, capture_bluestacks_ad
 
 #######################################################################################
 #                                        Notes:                                       #
 #######################################################################################
 
-def scrape_tiktok():
+def scrape_tiktok(interface="web"):
     # TODO - add support for custom output directory via environment variable
     # TODO - make console portion of CLI prettier and more user friendly
     # TODO - add better error handling for critical errors to log properly
     # TODO - catch the KeyboardInterrupt exception and close the webdriver and threads properly
-    # TODO - delete all images after processing to save space
+
+    # Load the environment variables
+    load_dotenv()
 
     # Check for output dirs and create them if non_existent
     src_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -52,11 +56,12 @@ def scrape_tiktok():
     end_time = datetime.datetime.now() + datetime.timedelta(hours=input_time)
 
     # Start the webdriver and allow the user to login
-    try:
-        driver = start_webdriver()
-    except Exception as e:
-        print(e)
-        quit(1)
+    if interface == "web":
+        try:
+            driver = start_webdriver()
+        except Exception as e:
+            print(e)
+            quit(1)
     vpn_inted = False
     while vpn_inted is False:
         vpn = input("Please ensure proper connection to the VPN, enter the location, and hit enter to continue.")
@@ -64,7 +69,14 @@ def scrape_tiktok():
             vpn_inted = True
         else:
             print("Location is not a valid Canadian city to be scraped, please enter a valid location.")
-    driver.get("https://www.tiktok.com/")
+    if interface == "web":
+        driver.get("https://www.tiktok.com/")
+    elif interface == "mobile":
+        print("Please open your emulator of choice and open the TikTok app.")
+        hwnd = None
+        while hwnd is None:
+            window_name = input("Please enter the name of the window that contains the TikTok app: ")
+            hwnd = find_bluestacks_window(window_name)
     demographic_logged_in = False
     while demographic_logged_in is False:
         demographic = input("Please log in with a TikTok account, enter the demographic of the account, and hit enter to continue.")
@@ -80,10 +92,11 @@ def scrape_tiktok():
     data_lock = threading.Lock()
     stop_event = threading.Event()
     error_event = threading.Event()
+    keystroke_event = threading.Event()
 
     # Define and start the logging and scraping threads
     try:
-        logging_thread = threading.Thread(target=start_logging, args = (f"{demographic}_{vpn}", stop_event, error_event, data_lock))
+        logging_thread = threading.Thread(target=start_logging, args = (f"{demographic}_{vpn}", stop_event, error_event, keystroke_event, data_lock))
         logging_thread.start()
     except Exception as e:
         print(e)
@@ -92,7 +105,10 @@ def scrape_tiktok():
 
     # Define and start the processing thread
     try:
-        processing_thread = threading.Thread(target=finish_processing, args = (stop_event, error_event, processing_queue, output_dir, s3_client))
+        if interface == "web":
+            processing_thread = threading.Thread(target=finish_processing, args = (stop_event, error_event, processing_queue, output_dir, s3_client))
+        elif interface == "mobile":
+            processing_thread = threading.Thread(target=process_bluestacks_ad, args = (stop_event, error_event, keystroke_event, processing_queue, output_dir, s3_client))
         processing_thread.start()
     except Exception as e:
         print(e)
@@ -104,8 +120,18 @@ def scrape_tiktok():
     # Recursively scroll TikTok looking for ads until the designated time is up
     try:
         while datetime.datetime.now() < end_time:
-            search_for_ad(driver)
-            process_ad(driver, output_dir, data_lock, processing_queue)
+            if interface == "web":
+                search_for_ad(driver)
+                process_ad(driver, output_dir, data_lock, processing_queue)
+            elif interface == "mobile":
+                rect = find_bluestacks_ad(hwnd)
+                capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, processing_queue)
+    except KeyboardInterrupt:
+        print("Keyboard interrupt detected. Exiting...")
+        keystroke_event.set()
+        processing_thread.join()
+        logging_thread.join()
+        quit(0)
     except Exception as e:
         print(e)
         print("An error occurred while scraping TikTok. Exiting...")
@@ -117,11 +143,14 @@ def scrape_tiktok():
     # Stop the logging thread and close the webdriver
     stop_event.set()
     logging_thread.join()
-    driver.quit()
+    if interface == "web":
+        driver.quit()
+    processing_thread.join()
     print("Scraping complete. Please check the Output directory for the scraped ads.")
 
 
 
 # Test code below
 if __name__ == '__main__':
-    scrape_tiktok()
+    interface = input("Please enter the interface you would like to use (web/mobile): ")
+    scrape_tiktok(interface)

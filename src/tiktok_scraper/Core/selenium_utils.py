@@ -10,7 +10,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from dotenv import load_dotenv
 
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
@@ -22,7 +21,6 @@ from tiktok_scraper.Core.global_vars import monitoring_data
 
 # Open Chrome and navigate to TikTok
 def start_webdriver():
-    load_dotenv()
     # Find the chromedriver according to the OS in use
     this_file_path = os.path.abspath(__file__)
     os_in_use = platform.system().lower()

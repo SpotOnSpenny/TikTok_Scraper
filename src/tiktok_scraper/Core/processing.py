@@ -68,7 +68,6 @@ def stitch_video(folder_name, fps, ad_id):
         video = cv2.VideoWriter(video_name, fourcc, fps, (width, height))
         for image in images:
             video.write(cv2.imread(os.path.join(folder_name, image)))
-        cv2.destroyAllWindows()
         video.release()
         return(video_name)
     except Exception as e:

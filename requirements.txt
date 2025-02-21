@@ -6,3 +6,9 @@ ffmpeg
 beautifulsoup4
 pandas
 boto3
+pypiwin32
+pillow
+pytesseract
+fuzzywuzzy
+python-Levenshtein
+easyocr

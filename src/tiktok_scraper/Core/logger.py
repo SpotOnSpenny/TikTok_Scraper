@@ -14,7 +14,7 @@ from tiktok_scraper.Core.global_vars import monitoring_data
 #                                        Notes:                                       #
 #######################################################################################
 
-def start_logging(profile, stop_event, error_event, data_lock):
+def start_logging(profile, stop_event, error_event, keystroke_event, data_lock):
     # ----- Load env variables and use to instantiate remote logging -----
     try:
         papertrail_port = os.environ["PAPERTRAIL_PORT"]
@@ -50,9 +50,9 @@ def start_logging(profile, stop_event, error_event, data_lock):
     logger.info(f"Logging started for {profile} at {datetime.now()}")
     
     # Start logging and chekc if the stop event has been set every 5 seconds
-    while not stop_event.is_set() and not error_event.is_set():
+    while not stop_event.is_set() and not error_event.is_set() and not keystroke_event.is_set():
         for _ in range(180):
-            if stop_event.is_set():
+            if stop_event.is_set() or error_event.is_set() or keystroke_event.is_set():
                 break
             time.sleep(5)
         with data_lock:
@@ -61,6 +61,9 @@ def start_logging(profile, stop_event, error_event, data_lock):
     if error_event.is_set():
         logger.error("An error occurred during the scraping process. Exiting program, check console output for error.")
         logger.info(f"Prior to error, we found {monitoring_data['ads_found']} ads in {monitoring_data['videos_watched']} videos.")
+    elif keystroke_event.is_set():
+        logger.info("User terminated the program with a keyboard interrupt. Exiting program.")
+        logger.info(f"Prior to termination, we found {monitoring_data['ads_found']} ads in {monitoring_data['videos_watched']} videos.")
     else:
         logger.info(f"Scraping process completed, found {monitoring_data['ads_found']} ads in {monitoring_data['videos_watched']} videos. Exiting program.")
 
