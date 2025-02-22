@@ -6,6 +6,8 @@ import pandas
 import shutil
 import traceback
 import queue
+import ctypes
+import contextlib
 
 # External Dependency Imports
 import win32gui
@@ -24,12 +26,20 @@ from tiktok_scraper.Core.processing import stitch_video
 #######################################################################################
 #                                        Notes:                                       #
 #######################################################################################
-#TODO: Extend timeout so that we don't timeout after not finding an ad for a while
-#TODO: Add a catch error so that
 
 sponsored_flags = ["Sponsored", "Paid Promotion", "Promoted Music"]
+ctypes.windll.user32.SetProcessDPIAware()
 
-# Code Go Here! :)
+@contextlib.contextmanager
+def gdi_context(dcObj, cDC, wDC, dataBitMap, hwnd):
+    try:
+        yield
+    finally:
+        dcObj.DeleteDC()
+        cDC.DeleteDC()
+        win32gui.ReleaseDC(hwnd, wDC)
+        win32gui.DeleteObject(dataBitMap.GetHandle())
+
 def find_bluestacks_window(window_name):
     print("locating window")
     def callback(hwnd, results):
@@ -97,14 +107,9 @@ def take_screencaps(hwnd, rect, file_name):
     dataBitMap = win32ui.CreateBitmap()
     dataBitMap.CreateCompatibleBitmap(dcObj, w, h)
     cDC.SelectObject(dataBitMap)
-    cDC.BitBlt((0,0),(w, h) , dcObj, (0,0), win32con.SRCCOPY)
-    dataBitMap.SaveBitmapFile(cDC, file_name)
-
-    # Free Resources
-    dcObj.DeleteDC()
-    cDC.DeleteDC()
-    win32gui.ReleaseDC(hwnd, wDC)
-    win32gui.DeleteObject(dataBitMap.GetHandle())
+    with gdi_context(dcObj, cDC, wDC, dataBitMap, hwnd):
+        cDC.BitBlt((0,0),(w, h) , dcObj, (0,0), win32con.SRCCOPY)
+        dataBitMap.SaveBitmapFile(cDC, file_name)
 
     return 
 
@@ -119,14 +124,9 @@ def check_for_ad(hwnd, rect):
     dataBitMap = win32ui.CreateBitmap()
     dataBitMap.CreateCompatibleBitmap(dcObj, w, h)
     cDC.SelectObject(dataBitMap)
-    cDC.BitBlt((0,0),(w, h) , dcObj, (0,h), win32con.SRCCOPY)
-    dataBitMap.SaveBitmapFile(cDC, os.path.join(check_folder, "screencap.png"))
-
-    # Free Resources
-    dcObj.DeleteDC()
-    cDC.DeleteDC()
-    win32gui.ReleaseDC(hwnd, wDC)
-    win32gui.DeleteObject(dataBitMap.GetHandle())
+    with gdi_context(dcObj, cDC, wDC, dataBitMap, hwnd):
+        cDC.BitBlt((0,0),(w, h) , dcObj, (0,h), win32con.SRCCOPY)
+        dataBitMap.SaveBitmapFile(cDC, os.path.join(check_folder, "screencap.png"))
 
     # check the screencap for a "Sponsored" badge
     image = cv2.imread(os.path.join(check_folder, "screencap.png"))
