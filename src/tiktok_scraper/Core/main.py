@@ -80,7 +80,7 @@ def scrape_tiktok(interface="web"):
     demographic_logged_in = False
     while demographic_logged_in is False:
         demographic = input("Please log in with a TikTok account, enter the demographic of the account, and hit enter to continue.")
-        if demographic.upper() in ["4M", "4F", "7F", "8M", "9F", "10M", "18M", "18F"]:
+        if demographic.upper() in ["4M", "4F", "7F", "6M", "9F", "10M", "18M", "18F"]:
             print("Scraping TikTok under the demographic: " + demographic)
             demographic_logged_in = True
         else:

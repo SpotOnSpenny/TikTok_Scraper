@@ -27,8 +27,9 @@ from tiktok_scraper.Core.processing import stitch_video
 #                                        Notes:                                       #
 #######################################################################################
 
-sponsored_flags = ["Sponsored", "Paid Promotion", "Promoted Music"]
+sponsored_flags = ["Sponsored", "Paid Promotion", "Paid partnership" "Promoted Music"]
 ctypes.windll.user32.SetProcessDPIAware()
+reader = easyocr.Reader(['en'], gpu=False, verbose=False)
 
 @contextlib.contextmanager
 def gdi_context(dcObj, cDC, wDC, dataBitMap, hwnd):
@@ -73,6 +74,20 @@ def scroll_down(hwnd, rect):
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
     monitoring_data["data_index"] += 1
     monitoring_data["videos_watched"] += 1
+
+    # Trim the memory if it's been 25 videos
+    # We trim twice since the first time sometimes just registers the hotkey, the second removes the memory
+    if monitoring_data["videos_watched"] % 25 == 0:
+        trim_mem()
+        time.sleep(1)
+        trim_mem()
+        time.sleep(1)
+    
+    # Every 150 videos send CTRL + SHIFT + 2 and wait 10 seconds to hit the back button and refresh the feed 
+    if monitoring_data["videos_watched"] % 150 == 0:
+        time.sleep(2)
+        refresh_feed()
+        time.sleep(10)
 
 def find_bluestacks_ad(hwnd):
     global monitoring_data
@@ -132,8 +147,9 @@ def check_for_ad(hwnd, rect):
     image = cv2.imread(os.path.join(check_folder, "screencap.png"))
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _, thresholded = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY +cv2.THRESH_OTSU)
-    reader = easyocr.Reader(['en'], gpu=False, verbose=False)
     result = reader.readtext(thresholded)
+    # Close the image to prevent memory leaks
+    cv2.destroyAllWindows()
     #iterate through the result and check for "Sponsored"
     for detection in result:
         if any([fuzz.ratio(detection[1], flag) > 78 for flag in sponsored_flags]):
@@ -195,7 +211,7 @@ def process_bluestacks_ad(stop_event, error_event, keystroke_event, job_queue, o
                 "Location": [ad_info["location"]],
                 "FPS": [ad_info["fps"]],
                 "Found At Index": [ad_info["found_at_index"]]
-            })
+            }).to_csv(os.path.join(output_dir, "Data Key.csv"), mode='a', header=False, index=False)
             print(f"Ad {ad_id} processed and uploaded to S3. Removing it from the disk.")
             shutil.rmtree(os.path.join(output_dir, ad_info["folder_name"]))
 
@@ -209,7 +225,39 @@ def process_bluestacks_ad(stop_event, error_event, keystroke_event, job_queue, o
             error_event.set()
             break
 
+def trim_mem():
+    print("Trimming memory")
+    # Press and hold Ctrl
+    win32api.keybd_event(win32con.VK_CONTROL, 0, 0, 0)
+    # Press and hold Shift
+    win32api.keybd_event(win32con.VK_SHIFT, 0, 0, 0)
+    # Press T
+    win32api.keybd_event(0x54, 0, 0, 0)  # 0x54 is the virtual key code for 'T'
+    # Release T
+    win32api.keybd_event(0x54, 0, win32con.KEYEVENTF_KEYUP, 0)
+    # Release Shift
+    win32api.keybd_event(win32con.VK_SHIFT, 0, win32con.KEYEVENTF_KEYUP, 0)
+    # Release Ctrl
+    win32api.keybd_event(win32con.VK_CONTROL, 0, win32con.KEYEVENTF_KEYUP, 0)
+
+def refresh_feed():
+    print("Refreshing feed")
+    # Press and hold Ctrl
+    win32api.keybd_event(win32con.VK_CONTROL, 0, 0, 0)
+    # Press and hold Shift
+    win32api.keybd_event(win32con.VK_SHIFT, 0, 0, 0)
+    # Press 2
+    win32api.keybd_event(0x32, 0, 0, 0)  # 0x32 is the virtual key code for '2'
+    # Release 2
+    win32api.keybd_event(0x32, 0, win32con.KEYEVENTF_KEYUP, 0)
+    # Release Shift
+    win32api.keybd_event(win32con.VK_SHIFT, 0, win32con.KEYEVENTF_KEYUP, 0)
+    # Release Ctrl
+    win32api.keybd_event(win32con.VK_CONTROL, 0, win32con.KEYEVENTF_KEYUP, 0)
+
 # Test code below
 if __name__ == '__main__':
-    hwnd = find_bluestacks_window("TT Bailey")
-    win32api.SendMessage(hwnd, win32con.WM_KEYDOWN, 0x45, 0)
+    hwnd = find_bluestacks_window("BlueStacks App Player 13")
+    rect = win32gui.GetWindowRect(hwnd)
+    scroll_down(hwnd, rect)
+    refresh_feed()
