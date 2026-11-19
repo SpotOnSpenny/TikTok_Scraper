@@ -41,7 +41,6 @@ def bluestacks(monkeypatch):
     monkeypatch.setitem(module.monitoring_data, "ads_this_log", 0)
     monkeypatch.setitem(module.monitoring_data, "demographic", "6M")
     monkeypatch.setitem(module.monitoring_data, "location", "calgary")
-    monkeypatch.setitem(module.housekeeping, "done_at", None)
     yield module
     sys.modules.pop("tiktok_scraper.Core.bluestacks", None)
 
@@ -50,7 +49,7 @@ def play(module, monkeypatch, names):
     # Each read of the screen returns the next fixture in the script
     script = iter(names)
     image = numpy.zeros((960, 540, 3), dtype=numpy.uint8)
-    monkeypatch.setattr(module, "read_screen", lambda hwnd, rect: (image, load_results("synthetic", next(script)), 800.0))
+    monkeypatch.setattr(module, "read_screen", lambda hwnd, rect: (image, load_results("synthetic", next(script)), 480, 800.0))
 
 
 def rows(log):
@@ -99,15 +98,46 @@ def test_ad_is_not_captured_twice_when_the_swipe_after_it_fails(bluestacks, monk
     assert log.current["flag"] == "Promoted Music"
 
 
-def test_no_text_twice_is_counted_and_flagged(bluestacks, monkeypatch, tmp_path):
+def test_reads_with_no_text_are_counted_and_flagged(bluestacks, monkeypatch, tmp_path):
     log = ImpressionLog(str(tmp_path), "session")
-    play(bluestacks, monkeypatch, ["no_text", "no_text", "ad_sponsored"])
+    # A video, then two reads with no text at all (for example a loading screen), then an ad
+    play(bluestacks, monkeypatch, ["ordinary_a", "no_text", "no_text", "ad_sponsored"])
     bluestacks.find_bluestacks_ad(1234, log)
     log.close("session_end")
 
-    assert bluestacks.monitoring_data["videos_watched"] == 3
-    assert [row["advance_confirmed"] for row in rows(log)] == [True, False, True]
+    assert bluestacks.monitoring_data["videos_watched"] == 4
+    assert [row["advance_confirmed"] for row in rows(log)] == [True, False, False, True]
     assert rows(log)[-1]["close_reason"] == "session_end"
+
+
+def test_label_appearing_after_a_failed_swipe_is_still_captured(bluestacks, monkeypatch, tmp_path):
+    log = ImpressionLog(str(tmp_path), "session")
+    # Read as an ordinary video, the swipe fails, and on the next read the badge is there
+    play(bluestacks, monkeypatch, ["ordinary_a", "ordinary_a_late_label"])
+    bluestacks.find_bluestacks_ad(1234, log)
+
+    assert bluestacks.monitoring_data["videos_watched"] == 1
+    assert log.is_ad()
+    log.close("session_end")
+    written = rows(log)
+    assert len(written) == 1
+    assert written[0]["is_ad"] is True
+    assert written[0]["label_read"] == 2
+    assert written[0]["swipe_attempts"] == 1
+
+
+def test_stuck_feed_is_refreshed_after_repeated_failed_swipes(bluestacks, monkeypatch, tmp_path):
+    log = ImpressionLog(str(tmp_path), "session")
+    # The same screen for eleven reads, then the feed moves on to an ad
+    play(bluestacks, monkeypatch, ["ordinary_a"] * 11 + ["ad_sponsored"])
+    bluestacks.find_bluestacks_ad(1234, log)
+
+    assert bluestacks.monitoring_data["videos_watched"] == 2
+    assert bluestacks.refresh_feed.call_count == 2
+    written = rows(log)
+    assert written[0]["swipe_attempts"] == 11
+    assert written[0]["stuck_refreshes"] == 2
+    assert written[0]["reads"] == 11
 
 
 def test_housekeeping_runs_once_per_counted_video(bluestacks, monkeypatch, tmp_path):

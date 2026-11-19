@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "shopfortunecharms",
-   "conf": 0.7469
+   "conf": 0.9999
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "Sd ago",
-   "conf": 0.6941
+   "conf": 0.7187
   },
   {
    "bbox": [
@@ -97,8 +97,7 @@
     ]
    ],
    "text": "FREE WORLDWIDE SHIPPING! Get your necklace nowl",
-   "conf": 0.7057
+   "conf": 0.9045
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

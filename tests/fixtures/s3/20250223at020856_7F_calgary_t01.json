@@ -5,9 +5,9 @@
   540,
   960
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  540,
+  459,
   480
  ],
  "detections": [
@@ -31,29 +31,29 @@
     ]
    ],
    "text": "@monica",
-   "conf": 0.9966
+   "conf": 0.9954
   },
   {
    "bbox": [
     [
-     481,
-     77
+     373,
+     73
     ],
     [
-     509,
-     77
+     415,
+     73
     ],
     [
-     509,
-     97
+     415,
+     93
     ],
     [
-     481,
-     97
+     373,
+     93
     ]
    ],
-   "text": "20",
-   "conf": 0.9667
+   "text": "(125",
+   "conf": 0.7794
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "Ttansitioning from working",
-   "conf": 0.9442
+   "conf": 0.9473
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "corporate",
-   "conf": 0.8797
+   "conf": 0.8656
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "9-5 jobl",
-   "conf": 0.4567
+   "conf": 0.3095
   },
   {
    "bbox": [
@@ -163,7 +163,7 @@
     ]
    ],
    "text": "working for myself-asa",
-   "conf": 0.7753
+   "conf": 0.8321
   },
   {
    "bbox": [
@@ -177,15 +177,15 @@
     ],
     [
      232,
-     190
+     191
     ],
     [
      17,
-     190
+     191
     ]
    ],
    "text": "creative entrepreneur",
-   "conf": 0.9997
+   "conf": 0.8577
   },
   {
    "bbox": [
@@ -207,29 +207,7 @@
     ]
    ],
    "text": "has been a",
-   "conf": 0.8198
-  },
-  {
-   "bbox": [
-    [
-     475,
-     165
-    ],
-    [
-     513,
-     165
-    ],
-    [
-     513,
-     185
-    ],
-    [
-     475,
-     185
-    ]
-   ],
-   "text": "359",
-   "conf": 0.9993
+   "conf": 0.7719
   },
   {
    "bbox": [
@@ -251,7 +229,7 @@
     ]
    ],
    "text": "dream come true_but it\"s",
-   "conf": 0.5666
+   "conf": 0.811
   },
   {
    "bbox": [
@@ -273,7 +251,7 @@
     ]
    ],
    "text": "See more",
-   "conf": 0.8165
+   "conf": 0.9573
   },
   {
    "bbox": [
@@ -317,7 +295,7 @@
     ]
    ],
    "text": "ic",
-   "conf": 0.7855
+   "conf": 0.7629
   },
   {
    "bbox": [
@@ -326,11 +304,11 @@
      273
     ],
     [
-     393,
+     394,
      273
     ],
     [
-     393,
+     394,
      317
     ],
     [
@@ -339,7 +317,7 @@
     ]
    ],
    "text": "PromotegaMusicarB learning",
-   "conf": 0.8125
+   "conf": 0.7077
   },
   {
    "bbox": [
@@ -361,7 +339,7 @@
     ]
    ],
    "text": "Learn more",
-   "conf": 0.9991
+   "conf": 0.9989
   },
   {
    "bbox": [
@@ -428,29 +406,6 @@
    ],
    "text": "Inbox",
    "conf": 0.9999
-  },
-  {
-   "bbox": [
-    [
-     461,
-     453
-    ],
-    [
-     513,
-     453
-    ],
-    [
-     513,
-     469
-    ],
-    [
-     461,
-     469
-    ]
-   ],
-   "text": "Profile",
-   "conf": 0.892
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -23,15 +23,15 @@
     ],
     [
      91,
-     369
+     367
     ],
     [
      15,
-     369
+     367
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.8309
+   "conf": 0.9996
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "cravecanada",
-   "conf": 0.8453
+   "conf": 0.8181
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "5d ago",
-   "conf": 0.6544
+   "conf": 0.7103
   },
   {
    "bbox": [
@@ -97,29 +97,7 @@
     ]
    ],
    "text": "The Ultimate Entertainment & Sports Bundle. Get hit movies, series",
-   "conf": 0.7644
-  },
-  {
-   "bbox": [
-    [
-     471,
-     411
-    ],
-    [
-     509,
-     411
-    ],
-    [
-     509,
-     425
-    ],
-    [
-     471,
-     425
-    ]
-   ],
-   "text": "more",
-   "conf": 0.9929
+   "conf": 0.8063
   },
   {
    "bbox": [
@@ -141,8 +119,7 @@
     ]
    ],
    "text": "n Promoted Music",
-   "conf": 0.7987
+   "conf": 0.7701
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

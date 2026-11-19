@@ -4,10 +4,15 @@ import json
 import os
 import random
 import re
+import sys
 import tempfile
 
 # External Dependency Imports
 import cv2
+
+# Internal Dependency Imports
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
+from tiktok_scraper.Core.impression import read_region
 
 #######################################################################################
 #                                        Notes:                                       #
@@ -37,12 +42,6 @@ def get_reader():
     return _reader
 
 
-def crop_for_check(image):
-    # Lower half of the window at full width, so the whole caption is in the crop
-    height = image.shape[0]
-    return image[height // 2:(height // 2) * 2, :]
-
-
 def ocr_crop(crop, run_ocr=True):
     if not run_ocr:
         return []
@@ -62,7 +61,7 @@ def safe_name(text):
 
 
 def write_fixture(image, out_dir, name, source, frame_time):
-    crop = crop_for_check(image)
+    crop = read_region(image)
     detections = ocr_crop(crop, RUN_OCR)
     os.makedirs(out_dir, exist_ok=True)
     cv2.imwrite(os.path.join(out_dir, f"{name}.jpg"), crop, [cv2.IMWRITE_JPEG_QUALITY, 95])
@@ -71,7 +70,7 @@ def write_fixture(image, out_dir, name, source, frame_time):
             "source": source,
             "frame_time_s": frame_time,
             "frame_size": [int(image.shape[1]), int(image.shape[0])],
-            "crop": "lower half, full width",
+            "crop": "read_region: lower half, right-hand count rail removed",
             "crop_size": [int(crop.shape[1]), int(crop.shape[0])],
             "detections": detections
         }, file, indent=1, ensure_ascii=False)

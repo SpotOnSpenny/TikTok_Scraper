@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9981
+   "conf": 0.9982
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "iamprestonluke",
-   "conf": 0.9009
+   "conf": 0.6289
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "2024-10-3",
-   "conf": 0.7025
+   "conf": 0.8595
   },
   {
    "bbox": [
@@ -97,30 +97,7 @@
     ]
    ],
    "text": "Design my gallery wall for the studio using Adobe @Photoshop",
-   "conf": 0.7663
-  },
-  {
-   "bbox": [
-    [
-     471,
-     435
-    ],
-    [
-     509,
-     435
-    ],
-    [
-     509,
-     449
-    ],
-    [
-     471,
-     449
-    ]
-   ],
-   "text": "more",
-   "conf": 0.9716
+   "conf": 0.7551
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

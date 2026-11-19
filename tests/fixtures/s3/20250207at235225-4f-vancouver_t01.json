@@ -5,55 +5,33 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
   {
    "bbox": [
     [
-     385,
-     59
+     384,
+     58
     ],
     [
-     433,
-     59
+     434,
+     58
     ],
     [
-     433,
-     103
+     434,
+     106
     ],
     [
-     385,
-     103
+     384,
+     106
     ]
    ],
    "text": "76",
-   "conf": 0.8862
-  },
-  {
-   "bbox": [
-    [
-     462,
-     78
-    ],
-    [
-     516,
-     78
-    ],
-    [
-     516,
-     128
-    ],
-    [
-     462,
-     128
-    ]
-   ],
-   "text": "Io",
-   "conf": 0.4246
+   "conf": 0.8923
   },
   {
    "bbox": [
@@ -75,7 +53,7 @@
     ]
    ],
    "text": "VALLEN",
-   "conf": 0.9976
+   "conf": 0.9966
   },
   {
    "bbox": [
@@ -97,7 +75,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9977
+   "conf": 0.8176
   },
   {
    "bbox": [
@@ -119,7 +97,7 @@
     ]
    ],
    "text": "cravecanada",
-   "conf": 0.9965
+   "conf": 0.9969
   },
   {
    "bbox": [
@@ -141,7 +119,7 @@
     ]
    ],
    "text": "1-16",
-   "conf": 0.4649
+   "conf": 0.5652
   },
   {
    "bbox": [
@@ -150,11 +128,11 @@
      431
     ],
     [
-     467,
+     445,
      431
     ],
     [
-     467,
+     445,
      451
     ],
     [
@@ -162,31 +140,8 @@
      451
     ]
    ],
-   "text": "It's the off-season; babyl A new season of Shoresy is nOWw streaming -",
-   "conf": 0.3817
-  },
-  {
-   "bbox": [
-    [
-     471,
-     435
-    ],
-    [
-     509,
-     435
-    ],
-    [
-     509,
-     449
-    ],
-    [
-     471,
-     449
-    ]
-   ],
-   "text": "more",
-   "conf": 0.9158
+   "text": "It's the off-season; babyl A new season of Shoresy is nOW streaming",
+   "conf": 0.5481
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

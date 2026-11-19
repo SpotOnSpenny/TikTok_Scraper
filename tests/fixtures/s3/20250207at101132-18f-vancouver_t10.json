@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -30,8 +30,8 @@
      355
     ]
    ],
-   "text": "Select subject",
-   "conf": 0.7149
+   "text": "Select subiect",
+   "conf": 0.6303
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "Remove background",
-   "conf": 0.8746
+   "conf": 0.933
   },
   {
    "bbox": [
@@ -80,29 +80,29 @@
   {
    "bbox": [
     [
-     9,
-     405
+     11,
+     407
     ],
     [
      129,
-     405
+     407
     ],
     [
      129,
      425
     ],
     [
-     9,
+     11,
      425
     ]
    ],
    "text": "adobephotoshop",
-   "conf": 1.0
+   "conf": 0.9402
   },
   {
    "bbox": [
     [
-     137,
+     135,
      405
     ],
     [
@@ -114,12 +114,12 @@
      421
     ],
     [
-     137,
+     135,
      421
     ]
    ],
    "text": "1-23",
-   "conf": 0.7186
+   "conf": 0.9093
   },
   {
    "bbox": [
@@ -128,11 +128,11 @@
      433
     ],
     [
-     147,
+     149,
      433
     ],
     [
-     147,
+     149,
      449
     ],
     [
@@ -141,8 +141,7 @@
     ]
    ],
    "text": "Remove Distractions",
-   "conf": 0.8889
+   "conf": 0.883
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

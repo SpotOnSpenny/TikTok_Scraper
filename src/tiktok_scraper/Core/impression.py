@@ -23,17 +23,29 @@ SPONSORED_FLAGS = ["Sponsored", "Paid Promotion", "Promoted Music"]
 LABEL_CUTOFF = 78
 # OCR detections below this confidence are left out of the account and caption text
 TEXT_MIN_CONFIDENCE = 0.3
-# App furniture that is on screen for every video and so says nothing about which video it is
+# The part of the window that is read: the lower half, without the right-hand rail of
+# like/comment/share counts (the rightmost 15% of the width)
+READ_WIDTH_SHARE = 0.85
+# App furniture that is on screen for every video and so says nothing about which video it is.
+# An exact match is dropped anywhere. A near match (OCR slips such as "Homes") is dropped only in
+# the bottom strip of the read region, where the navigation bar sits, so that an account called
+# "Homer" higher up is kept.
 SCREEN_CHROME = ["Home", "Friends", "Inbox", "Profile", "See more"]
 CHROME_CUTOFF = 80
-# Detections starting right of this share of the width are the like/comment/share counts
-RIGHT_RAIL_START = 0.85
+NAV_BAR_START = 0.85
 # Two reads are the same video when their whole text is at least this similar...
 SAME_VIDEO_THRESHOLD = 70
 # ...or when they share a line this long that is this similar (a caption line survives
 # text inside the video changing between reads). Set on the S3 ad frames, 2026-11-19.
 SHARED_LINE_MIN_LENGTH = 15
 SHARED_LINE_CUTOFF = 85
+
+
+def read_region(image):
+    # The slice of a full-window image that is given to the OCR. Used by the scraper and by
+    # tools/make_fixtures.py so that fixtures always show what the scraper reads.
+    height, width = image.shape[:2]
+    return image[height // 2:(height // 2) * 2, 0:int(width * READ_WIDTH_SHARE)]
 
 
 def match_label(results, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF):
@@ -50,10 +62,19 @@ def match_label(results, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF):
     return None, best_score, best_text
 
 
-def screen_text(results, width=None, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF, min_confidence=TEXT_MIN_CONFIDENCE):
+def is_chrome(text, top, height):
+    cleaned = text.lower().strip(" .:;,_-|")
+    if any(cleaned == chrome.lower() for chrome in SCREEN_CHROME):
+        return True
+    if height and top >= height * NAV_BAR_START:
+        return any(fuzz.ratio(cleaned, chrome.lower()) > CHROME_CUTOFF for chrome in SCREEN_CHROME)
+    return False
+
+
+def screen_text(results, height=None, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF, min_confidence=TEXT_MIN_CONFIDENCE):
     # Splits what was read into a best-effort account (top line) and caption (the rest).
-    # Label matches, app furniture, the right-hand count rail (when the width of the read
-    # region is given) and low-confidence detections are dropped. Provisional until the
+    # Label matches, app furniture and low-confidence detections are dropped. height is the
+    # height of the read region, used to find the navigation bar. Provisional until the
     # caption reader moves into this repository.
     kept = []
     for bbox, text, confidence in results:
@@ -62,11 +83,9 @@ def screen_text(results, width=None, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF,
             continue
         if any(fuzz.ratio(text, flag) > cutoff for flag in flags):
             continue
-        if any(fuzz.ratio(text.lower(), chrome.lower()) > CHROME_CUTOFF for chrome in SCREEN_CHROME):
-            continue
         top = min(point[1] for point in bbox)
         left = min(point[0] for point in bbox)
-        if width and left >= width * RIGHT_RAIL_START:
+        if is_chrome(text, top, height):
             continue
         kept.append((top, left, text))
     kept.sort()
@@ -143,9 +162,36 @@ class ImpressionLog:
             "scoring_ms": scoring_ms,
             "frame_path": frame_path,
             "advance_confirmed": advance_confirmed,
+            "reads": 1,
+            "label_read": 1 if flag is not None else None,
+            "stuck_refreshes": 0,
             "swipes": []
         }
         return self.index
+
+    def is_ad(self):
+        return self.current is not None and self.current["flag"] is not None
+
+    def swipe_count(self):
+        return len(self.current["swipes"]) if self.current else 0
+
+    def note_read(self):
+        # The video on screen was read again and found to be the same one
+        if self.current is not None:
+            self.current["reads"] += 1
+
+    def mark_ad(self, flag, score, matched_text):
+        # The label was not there on the first read of this video but is there now
+        if self.current is not None:
+            self.current["flag"] = flag
+            self.current["score"] = score
+            self.current["matched_text"] = matched_text
+            self.current["label_read"] = self.current["reads"]
+
+    def note_refresh(self):
+        # The feed was refreshed because swipes kept failing on this video
+        if self.current is not None:
+            self.current["stuck_refreshes"] += 1
 
     def note_swipe(self, at, params):
         # Record a swipe command sent while this video was on screen
@@ -177,6 +223,9 @@ class ImpressionLog:
             "matched_label": current["flag"],
             "match_score": current["score"],
             "matched_text": current["matched_text"],
+            "label_read": current["label_read"],
+            "reads": current["reads"],
+            "stuck_refreshes": current["stuck_refreshes"],
             "swipe": swipes[-1]["params"] if swipes else None,
             "swipe_attempts": len(swipes),
             "advance_confirmed": current["advance_confirmed"],

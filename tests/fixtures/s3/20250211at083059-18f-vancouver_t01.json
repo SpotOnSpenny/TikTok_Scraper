@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9995
+   "conf": 0.9996
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "H&R Block Canada",
-   "conf": 0.8259
+   "conf": 0.7955
   },
   {
    "bbox": [
@@ -74,8 +74,8 @@
      423
     ]
    ],
-   "text": "5d ago",
-   "conf": 0.5941
+   "text": "Sd ago",
+   "conf": 0.4874
   },
   {
    "bbox": [
@@ -96,9 +96,8 @@
      454
     ]
    ],
-   "text": "Be certain with tax expertise that gets yoU:.",
-   "conf": 0.6047
+   "text": "Be certain with tax expertise that gets yoU.",
+   "conf": 0.7583
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

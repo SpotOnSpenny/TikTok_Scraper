@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -30,8 +30,8 @@
      11
     ]
    ],
-   "text": "06400s",
-   "conf": 0.0416
+   "text": "06v408s",
+   "conf": 0.0189
   },
   {
    "bbox": [
@@ -52,8 +52,8 @@
      8
     ]
    ],
-   "text": "Vaidd",
-   "conf": 0.0063
+   "text": "Vald",
+   "conf": 0.0329
   },
   {
    "bbox": [
@@ -74,35 +74,13 @@
      11
     ]
    ],
-   "text": "40",
-   "conf": 0.0449
+   "text": "48c",
+   "conf": 0.0073
   },
   {
    "bbox": [
     [
      303,
-     0
-    ],
-    [
-     371,
-     0
-    ],
-    [
-     371,
-     13
-    ],
-    [
-     303,
-     13
-    ]
-   ],
-   "text": "GvG",
-   "conf": 0.1491
-  },
-  {
-   "bbox": [
-    [
-     385,
      0
     ],
     [
@@ -114,12 +92,12 @@
      13
     ],
     [
-     385,
+     303,
      13
     ]
    ],
-   "text": "\"y",
-   "conf": 0.0747
+   "text": "cvgiy",
+   "conf": 0.0952
   },
   {
    "bbox": [
@@ -163,7 +141,7 @@
     ]
    ],
    "text": "hushblankets",
-   "conf": 0.9725
+   "conf": 0.975
   },
   {
    "bbox": [
@@ -184,8 +162,8 @@
      421
     ]
    ],
-   "text": "1722",
-   "conf": 0.3273
+   "text": "1-22",
+   "conf": 0.3118
   },
   {
    "bbox": [
@@ -194,21 +172,20 @@
      432
     ],
     [
-     499,
+     445,
      432
     ],
     [
-     499,
-     453
+     445,
+     452
     ],
     [
      11,
-     453
+     452
     ]
    ],
-   "text": "All the dreamy duvet colours are back, shop now before they sell out again!",
-   "conf": 0.5691
+   "text": "All the dreamy duvet colours are back, shop now before they sell OL",
+   "conf": 0.5515
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

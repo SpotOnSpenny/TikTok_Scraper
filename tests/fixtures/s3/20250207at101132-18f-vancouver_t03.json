@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,29 +31,29 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9996
+   "conf": 0.9995
   },
   {
    "bbox": [
     [
-     9,
-     405
+     11,
+     407
     ],
     [
      129,
-     405
+     407
     ],
     [
      129,
      425
     ],
     [
-     9,
+     11,
      425
     ]
    ],
    "text": "adobephotoshop",
-   "conf": 1.0
+   "conf": 0.7805
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "1-23",
-   "conf": 0.9989
+   "conf": 0.9979
   },
   {
    "bbox": [
@@ -97,8 +97,7 @@
     ]
    ],
    "text": "Remove Distractions",
-   "conf": 0.896
+   "conf": 0.9105
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

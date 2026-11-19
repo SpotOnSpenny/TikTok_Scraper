@@ -5,16 +5,16 @@
   534,
   950
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  534,
+  453,
   475
  ],
  "detections": [
   {
    "bbox": [
     [
-     24,
+     22,
      136
     ],
     [
@@ -26,34 +26,12 @@
      168
     ],
     [
-     24,
+     22,
      168
     ]
    ],
    "text": "@Avocadosfrom Mexico",
-   "conf": 0.9744
-  },
-  {
-   "bbox": [
-    [
-     475,
-     165
-    ],
-    [
-     503,
-     165
-    ],
-    [
-     503,
-     185
-    ],
-    [
-     475,
-     185
-    ]
-   ],
-   "text": "54",
-   "conf": 1.0
+   "conf": 0.9126
   },
   {
    "bbox": [
@@ -67,15 +45,15 @@
     ],
     [
      384,
-     210
+     208
     ],
     [
      76,
-     210
+     208
     ]
    ],
-   "text": "Plot tist: the star @f your next",
-   "conf": 0.7527
+   "text": "Plt twist: the star @f your next",
+   "conf": 0.5598
   },
   {
    "bbox": [
@@ -97,7 +75,7 @@
     ]
    ],
    "text": "dinner party is a cauliflowerl Dressed",
-   "conf": 0.6336
+   "conf": 0.818
   },
   {
    "bbox": [
@@ -119,7 +97,7 @@
     ]
    ],
    "text": "in a luxurious avocad@ cream, this",
-   "conf": 0.4479
+   "conf": 0.4334
   },
   {
    "bbox": [
@@ -141,7 +119,7 @@
     ]
    ],
    "text": "veggie Steakis ready for i See more",
-   "conf": 0.6428
+   "conf": 0.6496
   },
   {
    "bbox": [
@@ -163,7 +141,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9989
+   "conf": 0.9978
   },
   {
    "bbox": [
@@ -184,8 +162,8 @@
      368
     ]
    ],
-   "text": ";ic",
-   "conf": 0.3163
+   "text": "iic",
+   "conf": 0.2757
   },
   {
    "bbox": [
@@ -207,7 +185,7 @@
     ]
    ],
    "text": "Promoted Music",
-   "conf": 0.8903
+   "conf": 0.882
   },
   {
    "bbox": [
@@ -229,7 +207,7 @@
     ]
    ],
    "text": "Home",
-   "conf": 0.9997
+   "conf": 0.9998
   },
   {
    "bbox": [
@@ -251,7 +229,7 @@
     ]
    ],
    "text": "Friends",
-   "conf": 1.0
+   "conf": 0.9996
   },
   {
    "bbox": [
@@ -260,11 +238,11 @@
      447
     ],
     [
-     397,
+     399,
      447
     ],
     [
-     397,
+     399,
      467
     ],
     [
@@ -273,30 +251,7 @@
     ]
    ],
    "text": "Inbox",
-   "conf": 0.8645
-  },
-  {
-   "bbox": [
-    [
-     455,
-     447
-    ],
-    [
-     507,
-     447
-    ],
-    [
-     507,
-     467
-    ],
-    [
-     455,
-     467
-    ]
-   ],
-   "text": "Profile",
-   "conf": 0.989
+   "conf": 0.7315
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

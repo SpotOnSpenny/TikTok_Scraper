@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,20 +31,20 @@
     ]
    ],
    "text": "SPORTS ON",
-   "conf": 0.6656
+   "conf": 0.8526
   },
   {
    "bbox": [
     [
      64,
-     153
+     151
     ],
     [
-     458,
-     153
+     445,
+     151
     ],
     [
-     458,
+     445,
      256
     ],
     [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "YOUR RADAR?",
-   "conf": 0.9998
+   "conf": 0.7223
   },
   {
    "bbox": [
@@ -75,29 +75,29 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9993
+   "conf": 0.8884
   },
   {
    "bbox": [
     [
-     11,
-     407
+     9,
+     405
     ],
     [
      103,
-     407
+     405
     ],
     [
      103,
      425
     ],
     [
-     11,
+     9,
      425
     ]
    ],
    "text": "NCSA_Sports",
-   "conf": 0.9988
+   "conf": 0.9367
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "2024-10-22",
-   "conf": 0.8111
+   "conf": 0.8457
   },
   {
    "bbox": [
@@ -140,9 +140,8 @@
      451
     ]
    ],
-   "text": "Unlock your full athletic potential with NCSA's MVP + Membership_",
-   "conf": 0.9009
+   "text": "Unlock your full athletic potential with NCSA's MVP + Membership",
+   "conf": 0.9433
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

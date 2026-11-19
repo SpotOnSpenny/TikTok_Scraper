@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -18,42 +18,42 @@
      4
     ],
     [
-     194,
+     193,
      4
     ],
     [
-     194,
-     30
+     193,
+     29
     ],
     [
      10,
-     30
+     29
     ]
    ],
-   "text": "@ledbeautygaugets",
-   "conf": 0.9091
+   "text": "@ledbeautygadgets",
+   "conf": 0.7304
   },
   {
    "bbox": [
     [
-     85,
-     305
+     84,
+     304
     ],
     [
-     171,
-     305
+     174,
+     304
     ],
     [
-     171,
-     319
+     174,
+     318
     ],
     [
-     85,
-     319
+     84,
+     318
     ]
    ],
-   "text": "ledbcautygadgut",
-   "conf": 0.1221
+   "text": "lodbcautvgadgot",
+   "conf": 0.2938
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "Portable Makeup Box",
-   "conf": 0.7548
+   "conf": 0.626
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "Ih ago",
-   "conf": 0.8758
+   "conf": 0.9115
   },
   {
    "bbox": [
@@ -141,8 +141,7 @@
     ]
    ],
    "text": "Use Code Fusion to Get 3096",
-   "conf": 0.4319
+   "conf": 0.461
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

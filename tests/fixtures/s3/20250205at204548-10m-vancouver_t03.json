@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "Budget Details 12",
-   "conf": 0.8942
+   "conf": 0.9537
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "2024-12-22",
-   "conf": 0.9303
+   "conf": 0.7027
   },
   {
    "bbox": [
@@ -97,20 +97,20 @@
     ]
    ],
    "text": "Leamn More Herel",
-   "conf": 0.894
+   "conf": 0.9614
   },
   {
    "bbox": [
     [
-     211,
+     212,
      114
     ],
     [
-     274,
+     273,
      129
     ],
     [
-     271,
+     270,
      143
     ],
     [
@@ -118,8 +118,8 @@
      128
     ]
    ],
-   "text": "mastateard",
-   "conf": 0.097
+   "text": "anastereard",
+   "conf": 0.037
   },
   {
    "bbox": [
@@ -141,8 +141,7 @@
     ]
    ],
    "text": "mastercord",
-   "conf": 0.4671
+   "conf": 0.4477
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

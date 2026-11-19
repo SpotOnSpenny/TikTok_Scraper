@@ -5,34 +5,12 @@
   554,
   984
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  554,
+  470,
   492
  ],
  "detections": [
-  {
-   "bbox": [
-    [
-     499,
-     73
-    ],
-    [
-     535,
-     73
-    ],
-    [
-     535,
-     89
-    ],
-    [
-     499,
-     89
-    ]
-   ],
-   "text": "2167",
-   "conf": 0.5958
-  },
   {
    "bbox": [
     [
@@ -53,95 +31,51 @@
     ]
    ],
    "text": "@Jade",
-   "conf": 0.5273
-  },
-  {
-   "bbox": [
-    [
-     507,
-     153
-    ],
-    [
-     529,
-     153
-    ],
-    [
-     529,
-     169
-    ],
-    [
-     507,
-     169
-    ]
-   ],
-   "text": "20",
-   "conf": 1.0
+   "conf": 0.5069
   },
   {
    "bbox": [
     [
      14,
-     168
+     171
     ],
     [
      436,
-     168
+     171
     ],
     [
      436,
-     199
+     198
     ],
     [
      14,
-     199
+     198
     ]
    ],
    "text": "#AveenoPartner Mornings are all about resetting",
-   "conf": 0.5499
+   "conf": 0.634
   },
   {
    "bbox": [
     [
-     15,
-     197
-    ],
-    [
-     53,
-     197
-    ],
-    [
-     53,
-     217
-    ],
-    [
-     15,
-     217
-    ]
-   ],
-   "text": "and",
-   "conf": 1.0
-  },
-  {
-   "bbox": [
-    [
-     48,
-     190
+     14,
+     193
     ],
     [
      206,
-     190
+     193
     ],
     [
      206,
      222
     ],
     [
-     48,
+     14,
      222
     ]
    ],
-   "text": "feeling refteshed",
-   "conf": 0.7199
+   "text": "and feeling refteshed;",
+   "conf": 0.6126
   },
   {
    "bbox": [
@@ -163,7 +97,7 @@
     ]
    ],
    "text": "Aveeno's Calm #",
-   "conf": 0.6979
+   "conf": 0.5928
   },
   {
    "bbox": [
@@ -185,29 +119,7 @@
     ]
    ],
    "text": "Restore Age Renewal Cream is my first step =",
-   "conf": 0.6385
-  },
-  {
-   "bbox": [
-    [
-     503,
-     225
-    ],
-    [
-     533,
-     225
-    ],
-    [
-     533,
-     241
-    ],
-    [
-     503,
-     241
-    ]
-   ],
-   "text": "425",
-   "conf": 0.8916
+   "conf": 0.6887
   },
   {
    "bbox": [
@@ -229,7 +141,7 @@
     ]
    ],
    "text": "24-hour hydration that leaves myski_ See more",
-   "conf": 0.7922
+   "conf": 0.7563
   },
   {
    "bbox": [
@@ -251,12 +163,12 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9511
+   "conf": 0.9652
   },
   {
    "bbox": [
     [
-     38,
+     40,
      310
     ],
     [
@@ -268,22 +180,22 @@
      334
     ],
     [
-     38,
+     40,
      334
     ]
    ],
    "text": "Music",
-   "conf": 0.9989
+   "conf": 0.9998
   },
   {
    "bbox": [
     [
      108,
-     309
+     310
     ],
     [
      246,
-     309
+     310
     ],
     [
      246,
@@ -294,30 +206,30 @@
      334
     ]
    ],
-   "text": "Promoted Must",
-   "conf": 0.9817
+   "text": "Promoted Musf",
+   "conf": 0.7693
   },
   {
    "bbox": [
     [
-     178,
-     358
+     179,
+     361
     ],
     [
-     260,
-     358
+     259,
+     361
     ],
     [
-     260,
-     382
+     259,
+     381
     ],
     [
-     178,
-     382
+     179,
+     381
     ]
    ],
    "text": "Shop now",
-   "conf": 0.9913
+   "conf": 0.6638
   },
   {
    "bbox": [
@@ -339,7 +251,7 @@
     ]
    ],
    "text": "Home",
-   "conf": 0.9964
+   "conf": 0.9962
   },
   {
    "bbox": [
@@ -360,8 +272,8 @@
      481
     ]
    ],
-   "text": "Frlends",
-   "conf": 0.4454
+   "text": "Flends",
+   "conf": 0.9593
   },
   {
    "bbox": [
@@ -383,30 +295,7 @@
     ]
    ],
    "text": "Inbox",
-   "conf": 0.9972
-  },
-  {
-   "bbox": [
-    [
-     479,
-     465
-    ],
-    [
-     521,
-     465
-    ],
-    [
-     521,
-     481
-    ],
-    [
-     479,
-     481
-    ]
-   ],
-   "text": "Protile",
-   "conf": 0.6982
+   "conf": 0.997
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

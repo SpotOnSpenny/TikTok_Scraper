@@ -5,34 +5,12 @@
   524,
   930
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   465
  ],
  "detections": [
-  {
-   "bbox": [
-    [
-     467,
-     75
-    ],
-    [
-     491,
-     75
-    ],
-    [
-     491,
-     95
-    ],
-    [
-     467,
-     95
-    ]
-   ],
-   "text": "21",
-   "conf": 1.0
-  },
   {
    "bbox": [
     [
@@ -53,29 +31,7 @@
     ]
    ],
    "text": "@Flavour Network",
-   "conf": 0.9489
-  },
-  {
-   "bbox": [
-    [
-     461,
-     161
-    ],
-    [
-     497,
-     161
-    ],
-    [
-     497,
-     181
-    ],
-    [
-     461,
-     181
-    ]
-   ],
-   "text": "891",
-   "conf": 0.9999
+   "conf": 0.9534
   },
   {
    "bbox": [
@@ -89,20 +45,20 @@
     ],
     [
      282,
-     206
+     204
     ],
     [
      20,
-     206
+     204
     ]
    ],
-   "text": "Biria tacosyoU cant resist",
-   "conf": 0.6128
+   "text": "Bira tacos [ou can\"t resist",
+   "conf": 0.5444
   },
   {
    "bbox": [
     [
-     20,
+     22,
      202
     ],
     [
@@ -114,12 +70,12 @@
      232
     ],
     [
-     20,
+     22,
      232
     ]
    ],
    "text": "@The Nguyen Food Stall",
-   "conf": 0.7514
+   "conf": 0.6709
   },
   {
    "bbox": [
@@ -133,37 +89,15 @@
     ],
     [
      382,
-     280
+     281
     ],
     [
      18,
-     280
+     281
     ]
    ],
    "text": "#birria #birriatacos #tac_ See more",
-   "conf": 0.9207
-  },
-  {
-   "bbox": [
-    [
-     461,
-     257
-    ],
-    [
-     497,
-     257
-    ],
-    [
-     497,
-     277
-    ],
-    [
-     461,
-     277
-    ]
-   ],
-   "text": "126",
-   "conf": 0.6222
+   "conf": 0.7345
   },
   {
    "bbox": [
@@ -185,7 +119,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9993
+   "conf": 0.9995
   },
   {
    "bbox": [
@@ -207,7 +141,7 @@
     ]
    ],
    "text": "we're taking classic birria",
-   "conf": 0.6542
+   "conf": 0.8396
   },
   {
    "bbox": [
@@ -229,7 +163,7 @@
     ]
    ],
    "text": "{ecomote3",
-   "conf": 0.2425
+   "conf": 0.2622
   },
   {
    "bbox": [
@@ -251,7 +185,7 @@
     ]
    ],
    "text": "andaddingafun twist",
-   "conf": 0.9256
+   "conf": 0.8407
   },
   {
    "bbox": [
@@ -273,7 +207,7 @@
     ]
    ],
    "text": "] Music",
-   "conf": 0.4054
+   "conf": 0.481
   },
   {
    "bbox": [
@@ -295,46 +229,46 @@
     ]
    ],
    "text": "Mus",
-   "conf": 0.9144
+   "conf": 0.9053
   },
   {
    "bbox": [
     [
-     29,
-     441
+     27,
+     437
     ],
     [
      77,
-     441
+     437
     ],
     [
      77,
      457
     ],
     [
-     29,
+     27,
      457
     ]
    ],
    "text": "Home",
-   "conf": 0.9949
+   "conf": 0.9945
   },
   {
    "bbox": [
     [
-     129,
-     439
+     131,
+     441
     ],
     [
      187,
-     439
+     441
     ],
     [
      187,
      457
     ],
     [
-     129,
+     131,
      457
     ]
    ],
@@ -361,30 +295,7 @@
     ]
    ],
    "text": "Inbox",
-   "conf": 0.9527
-  },
-  {
-   "bbox": [
-    [
-     445,
-     437
-    ],
-    [
-     499,
-     437
-    ],
-    [
-     499,
-     457
-    ],
-    [
-     445,
-     457
-    ]
-   ],
-   "text": "Profile",
-   "conf": 0.9988
+   "conf": 0.9942
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

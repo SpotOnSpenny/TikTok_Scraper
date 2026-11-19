@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9994
+   "conf": 0.7162
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "NaomiJane",
-   "conf": 0.9543
+   "conf": 0.9723
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "1-11",
-   "conf": 0.4261
+   "conf": 0.6446
   },
   {
    "bbox": [
@@ -84,11 +84,11 @@
      433
     ],
     [
-     255,
+     297,
      433
     ],
     [
-     255,
+     297,
      449
     ],
     [
@@ -96,31 +96,8 @@
      449
     ]
    ],
-   "text": "Like Like Love You is Out Nowl Check",
-   "conf": 0.6863
-  },
-  {
-   "bbox": [
-    [
-     267,
-     435
-    ],
-    [
-     297,
-     435
-    ],
-    [
-     297,
-     449
-    ],
-    [
-     267,
-     449
-    ]
-   ],
-   "text": "outl",
-   "conf": 0.6095
+   "text": "Like Like Love You is Out Nowl Check it outl",
+   "conf": 0.8275
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

@@ -5,77 +5,33 @@
   534,
   948
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  534,
+  453,
   474
  ],
  "detections": [
   {
    "bbox": [
     [
-     485,
-     75
-    ],
-    [
-     519,
-     75
-    ],
-    [
-     519,
-     93
-    ],
-    [
-     485,
-     93
-    ]
-   ],
-   "text": "003",
-   "conf": 0.8184
-  },
-  {
-   "bbox": [
-    [
-     13,
-     178
+     11,
+     177
     ],
     [
      207,
-     178
+     177
     ],
     [
      207,
      215
     ],
     [
-     13,
+     11,
      215
     ]
    ],
    "text": "Pro Hockev Life",
-   "conf": 0.9257
-  },
-  {
-   "bbox": [
-    [
-     479,
-     215
-    ],
-    [
-     509,
-     215
-    ],
-    [
-     509,
-     235
-    ],
-    [
-     479,
-     235
-    ]
-   ],
-   "text": "116",
-   "conf": 0.4341
+   "conf": 0.6828
   },
   {
    "bbox": [
@@ -89,15 +45,15 @@
     ],
     [
      386,
-     254
+     252
     ],
     [
      14,
-     254
+     252
     ]
    ],
-   "text": "ASMR Gold: The Best Hockev Sounds",
-   "conf": 0.5082
+   "text": "ASMR Gold: The Best Hockey Sounds",
+   "conf": 0.6478
   },
   {
    "bbox": [
@@ -119,7 +75,7 @@
     ]
    ],
    "text": "in the Shooting Lane",
-   "conf": 0.7321
+   "conf": 0.6874
   },
   {
    "bbox": [
@@ -141,29 +97,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.5287
-  },
-  {
-   "bbox": [
-    [
-     483,
-     299
-    ],
-    [
-     507,
-     299
-    ],
-    [
-     507,
-     317
-    ],
-    [
-     483,
-     317
-    ]
-   ],
-   "text": "12",
-   "conf": 0.9979
+   "conf": 0.6699
   },
   {
    "bbox": [
@@ -185,7 +119,29 @@
     ]
    ],
    "text": "Learn more",
-   "conf": 0.9982
+   "conf": 0.9985
+  },
+  {
+   "bbox": [
+    [
+     149,
+     423
+    ],
+    [
+     175,
+     423
+    ],
+    [
+     175,
+     439
+    ],
+    [
+     149,
+     439
+    ]
+   ],
+   "text": "90",
+   "conf": 0.6039
   },
   {
    "bbox": [
@@ -207,7 +163,7 @@
     ]
    ],
    "text": "Home",
-   "conf": 0.9658
+   "conf": 0.9975
   },
   {
    "bbox": [
@@ -229,7 +185,7 @@
     ]
    ],
    "text": "Fuiends",
-   "conf": 0.5408
+   "conf": 0.5173
   },
   {
    "bbox": [
@@ -251,30 +207,7 @@
     ]
    ],
    "text": "Inbox",
-   "conf": 0.9068
-  },
-  {
-   "bbox": [
-    [
-     457,
-     447
-    ],
-    [
-     507,
-     447
-    ],
-    [
-     507,
-     465
-    ],
-    [
-     457,
-     465
-    ]
-   ],
-   "text": "Profile",
-   "conf": 0.9018
+   "conf": 0.9347
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "@ledbeautyga -",
-   "conf": 0.2427
+   "conf": 0.2038
   },
   {
    "bbox": [
@@ -45,15 +45,15 @@
     ],
     [
      181,
-     321
+     319
     ],
     [
      85,
-     321
+     319
     ]
    ],
-   "text": "ledbcautygadgots",
-   "conf": 0.5095
+   "text": "lodbcautygadgots",
+   "conf": 0.2819
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9998
+   "conf": 0.9997
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "Portable Makeup Box",
-   "conf": 0.4718
+   "conf": 0.9206
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "Ih ago",
-   "conf": 0.9158
+   "conf": 0.9118
   },
   {
    "bbox": [
@@ -141,8 +141,7 @@
     ]
    ],
    "text": "Use Code Fusion to Get 30%",
-   "conf": 0.7724
+   "conf": 0.7172
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

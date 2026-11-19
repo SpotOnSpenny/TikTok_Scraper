@@ -5,55 +5,33 @@
   540,
   960
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  540,
+  459,
   480
  ],
  "detections": [
   {
    "bbox": [
     [
-     20,
-     66
+     19,
+     65
     ],
     [
      138,
-     66
+     65
     ],
     [
      138,
      98
     ],
     [
-     20,
+     19,
      98
     ]
    ],
    "text": "@monica",
-   "conf": 0.9979
-  },
-  {
-   "bbox": [
-    [
-     481,
-     77
-    ],
-    [
-     509,
-     77
-    ],
-    [
-     509,
-     97
-    ],
-    [
-     481,
-     97
-    ]
-   ],
-   "text": "20",
-   "conf": 0.9998
+   "conf": 0.9971
   },
   {
    "bbox": [
@@ -74,8 +52,8 @@
      138
     ]
    ],
-   "text": "Transitioning from working a corporate ",
-   "conf": 0.6018
+   "text": "Transitioning from working a corporate",
+   "conf": 0.8894
   },
   {
    "bbox": [
@@ -97,7 +75,7 @@
     ]
    ],
    "text": "9-5 job",
-   "conf": 0.8522
+   "conf": 0.8664
   },
   {
    "bbox": [
@@ -119,7 +97,7 @@
     ]
    ],
    "text": "to",
-   "conf": 0.9998
+   "conf": 0.9987
   },
   {
    "bbox": [
@@ -141,7 +119,7 @@
     ]
    ],
    "text": "working for-myself asa",
-   "conf": 0.9271
+   "conf": 0.9079
   },
   {
    "bbox": [
@@ -163,7 +141,7 @@
     ]
    ],
    "text": "creative entrepreneur",
-   "conf": 0.9917
+   "conf": 0.9861
   },
   {
    "bbox": [
@@ -185,29 +163,7 @@
     ]
    ],
    "text": "has been a",
-   "conf": 0.862
-  },
-  {
-   "bbox": [
-    [
-     475,
-     165
-    ],
-    [
-     513,
-     165
-    ],
-    [
-     513,
-     185
-    ],
-    [
-     475,
-     185
-    ]
-   ],
-   "text": "359",
-   "conf": 1.0
+   "conf": 0.8659
   },
   {
    "bbox": [
@@ -229,7 +185,7 @@
     ]
    ],
    "text": "dream come true_but it's",
-   "conf": 0.8063
+   "conf": 0.8746
   },
   {
    "bbox": [
@@ -251,7 +207,7 @@
     ]
    ],
    "text": "See more",
-   "conf": 0.9963
+   "conf": 0.6721
   },
   {
    "bbox": [
@@ -278,28 +234,6 @@
   {
    "bbox": [
     [
-     481,
-     265
-    ],
-    [
-     509,
-     265
-    ],
-    [
-     509,
-     285
-    ],
-    [
-     481,
-     285
-    ]
-   ],
-   "text": "38",
-   "conf": 1.0
-  },
-  {
-   "bbox": [
-    [
      48,
      274
     ],
@@ -317,7 +251,7 @@
     ]
    ],
    "text": "MMusic",
-   "conf": 0.9249
+   "conf": 0.9183
   },
   {
    "bbox": [
@@ -339,7 +273,7 @@
     ]
    ],
    "text": "PrgmotedMusite visuals",
-   "conf": 0.8408
+   "conf": 0.8526
   },
   {
    "bbox": [
@@ -361,7 +295,7 @@
     ]
    ],
    "text": "Learn more",
-   "conf": 0.9991
+   "conf": 0.9989
   },
   {
    "bbox": [
@@ -428,29 +362,6 @@
    ],
    "text": "Inbox",
    "conf": 0.9997
-  },
-  {
-   "bbox": [
-    [
-     461,
-     453
-    ],
-    [
-     513,
-     453
-    ],
-    [
-     513,
-     471
-    ],
-    [
-     461,
-     471
-    ]
-   ],
-   "text": "Profile",
-   "conf": 0.9999
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

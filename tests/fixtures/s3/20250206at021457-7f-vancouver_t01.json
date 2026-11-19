@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,17 +31,17 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9996
+   "conf": 0.9995
   },
   {
    "bbox": [
     [
      11,
-     407
+     405
     ],
     [
      153,
-     407
+     405
     ],
     [
      153,
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "Influencer Marketing",
-   "conf": 0.6822
+   "conf": 0.9504
   },
   {
    "bbox": [
@@ -75,12 +75,12 @@
     ]
    ],
    "text": "Id ago",
-   "conf": 0.5548
+   "conf": 0.7742
   },
   {
    "bbox": [
     [
-     9,
+     10,
      431
     ],
     [
@@ -92,13 +92,12 @@
      451
     ],
     [
-     9,
+     10,
      451
     ]
    ],
    "text": "Absolutely worth itl",
-   "conf": 0.8158
+   "conf": 0.8796
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9992
+   "conf": 0.9991
   },
   {
    "bbox": [
@@ -52,8 +52,8 @@
      419
     ]
    ],
-   "text": "oneskin co",
-   "conf": 0.4361
+   "text": "oneskinco",
+   "conf": 0.9898
   },
   {
    "bbox": [
@@ -75,74 +75,29 @@
     ]
    ],
    "text": "2d ago",
-   "conf": 0.9766
+   "conf": 0.9692
   },
   {
    "bbox": [
     [
-     10,
-     430
+     11,
+     432
     ],
     [
-     428,
-     430
+     427,
+     432
     ],
     [
-     428,
-     454
+     427,
+     453
     ],
     [
-     10,
-     454
+     11,
+     453
     ]
    ],
    "text": "If skin longevity is your love language__ meet the OS-01 peptide",
-   "conf": 0.625
-  },
-  {
-   "bbox": [
-    [
-     433,
-     435
-    ],
-    [
-     467,
-     435
-    ],
-    [
-     467,
-     451
-    ],
-    [
-     433,
-     451
-    ]
-   ],
-   "text": "yo_",
-   "conf": 0.4406
-  },
-  {
-   "bbox": [
-    [
-     471,
-     435
-    ],
-    [
-     509,
-     435
-    ],
-    [
-     509,
-     449
-    ],
-    [
-     471,
-     449
-    ]
-   ],
-   "text": "more",
-   "conf": 0.9906
+   "conf": 0.665
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

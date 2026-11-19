@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.8548
+   "conf": 0.9996
   },
   {
    "bbox": [
@@ -40,11 +40,11 @@
      407
     ],
     [
-     223,
+     73,
      407
     ],
     [
-     223,
+     73,
      423
     ],
     [
@@ -52,8 +52,30 @@
      423
     ]
    ],
-   "text": "Buy Now Pay Later Smartphone",
-   "conf": 0.6788
+   "text": "Buy Now",
+   "conf": 0.7089
+  },
+  {
+   "bbox": [
+    [
+     101,
+     407
+    ],
+    [
+     223,
+     407
+    ],
+    [
+     223,
+     423
+    ],
+    [
+     101,
+     423
+    ]
+   ],
+   "text": "Later Smartphone",
+   "conf": 0.9627
   },
   {
    "bbox": [
@@ -67,15 +89,15 @@
     ],
     [
      283,
-     425
+     423
     ],
     [
      231,
-     425
+     423
     ]
    ],
    "text": "5d ago",
-   "conf": 0.6595
+   "conf": 0.785
   },
   {
    "bbox": [
@@ -96,9 +118,30 @@
      451
     ]
    ],
-   "text": "4.95/5 **t**",
-   "conf": 0.1405
+   "text": "4.95/5 *****",
+   "conf": 0.5124
+  },
+  {
+   "bbox": [
+    [
+     73,
+     404
+    ],
+    [
+     102,
+     409
+    ],
+    [
+     99,
+     425
+    ],
+    [
+     70,
+     421
+    ]
+   ],
+   "text": "Pay t",
+   "conf": 0.1461
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

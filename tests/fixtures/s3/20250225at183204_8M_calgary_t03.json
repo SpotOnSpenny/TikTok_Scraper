@@ -5,43 +5,21 @@
   524,
   930
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   465
  ],
  "detections": [
   {
    "bbox": [
     [
-     467,
-     75
-    ],
-    [
-     493,
-     75
-    ],
-    [
-     493,
-     95
-    ],
-    [
-     467,
-     95
-    ]
-   ],
-   "text": "21",
-   "conf": 0.9978
-  },
-  {
-   "bbox": [
-    [
      43,
-     135
+     133
     ],
     [
      233,
-     135
+     133
     ],
     [
      233,
@@ -53,29 +31,7 @@
     ]
    ],
    "text": "Flavour Network",
-   "conf": 0.8691
-  },
-  {
-   "bbox": [
-    [
-     461,
-     161
-    ],
-    [
-     497,
-     161
-    ],
-    [
-     497,
-     181
-    ],
-    [
-     461,
-     181
-    ]
-   ],
-   "text": "891",
-   "conf": 0.9943
+   "conf": 0.9442
   },
   {
    "bbox": [
@@ -96,13 +52,13 @@
      204
     ]
    ],
-   "text": "Bima tacos VoU can\"t resist",
-   "conf": 0.4984
+   "text": "Bima tacos yoU can\"t resist",
+   "conf": 0.4644
   },
   {
    "bbox": [
     [
-     20,
+     22,
      202
     ],
     [
@@ -114,12 +70,12 @@
      232
     ],
     [
-     20,
+     22,
      232
     ]
    ],
    "text": "@The Nguyen Food Stall",
-   "conf": 0.8134
+   "conf": 0.9158
   },
   {
    "bbox": [
@@ -141,29 +97,7 @@
     ]
    ],
    "text": "#birria #birriatacos #tac_ See more",
-   "conf": 0.6864
-  },
-  {
-   "bbox": [
-    [
-     461,
-     257
-    ],
-    [
-     497,
-     257
-    ],
-    [
-     497,
-     277
-    ],
-    [
-     461,
-     277
-    ]
-   ],
-   "text": "126",
-   "conf": 0.9999
+   "conf": 0.657
   },
   {
    "bbox": [
@@ -185,7 +119,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9995
+   "conf": 0.9994
   },
   {
    "bbox": [
@@ -207,7 +141,7 @@
     ]
    ],
    "text": "with some@f",
-   "conf": 0.867
+   "conf": 0.933
   },
   {
    "bbox": [
@@ -229,7 +163,7 @@
     ]
    ],
    "text": "favourite",
-   "conf": 0.9996
+   "conf": 0.9997
   },
   {
    "bbox": [
@@ -251,7 +185,7 @@
     ]
    ],
    "text": "Promoted",
-   "conf": 0.9992
+   "conf": 0.9991
   },
   {
    "bbox": [
@@ -273,7 +207,7 @@
     ]
    ],
    "text": "\"Msisicpapiv",
-   "conf": 0.1083
+   "conf": 0.1096
   },
   {
    "bbox": [
@@ -295,7 +229,7 @@
     ]
    ],
    "text": "ftems",
-   "conf": 0.9762
+   "conf": 0.9836
   },
   {
    "bbox": [
@@ -317,7 +251,7 @@
     ]
    ],
    "text": "Home",
-   "conf": 0.9979
+   "conf": 0.998
   },
   {
    "bbox": [
@@ -366,28 +300,6 @@
   {
    "bbox": [
     [
-     445,
-     437
-    ],
-    [
-     499,
-     437
-    ],
-    [
-     499,
-     457
-    ],
-    [
-     445,
-     457
-    ]
-   ],
-   "text": "Profile",
-   "conf": 0.9979
-  },
-  {
-   "bbox": [
-    [
      260,
      293
     ],
@@ -405,8 +317,7 @@
     ]
    ],
    "text": "'mV_",
-   "conf": 0.1425
+   "conf": 0.1542
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

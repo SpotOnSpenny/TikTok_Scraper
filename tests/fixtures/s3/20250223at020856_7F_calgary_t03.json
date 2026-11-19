@@ -5,9 +5,9 @@
   540,
   960
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  540,
+  459,
   480
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "2025",
-   "conf": 0.9849
+   "conf": 0.9738
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "@monica",
-   "conf": 0.6974
+   "conf": 0.6787
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "Tiransitioning from working a corporate",
-   "conf": 0.3673
+   "conf": 0.377
   },
   {
    "bbox": [
@@ -102,24 +102,24 @@
   {
    "bbox": [
     [
-     118,
-     131
+     122,
+     134
     ],
     [
-     377,
-     131
+     378,
+     134
     ],
     [
-     377,
-     168
+     378,
+     167
     ],
     [
-     118,
-     168
+     122,
+     167
     ]
    ],
-   "text": "~toworking for myself asa",
-   "conf": 0.7342
+   "text": "towotking for myself asa",
+   "conf": 0.8001
   },
   {
    "bbox": [
@@ -141,7 +141,7 @@
     ]
    ],
    "text": "creative enitepreneur",
-   "conf": 0.6698
+   "conf": 0.6895
   },
   {
    "bbox": [
@@ -163,29 +163,7 @@
     ]
    ],
    "text": "has beena",
-   "conf": 0.5063
-  },
-  {
-   "bbox": [
-    [
-     477,
-     165
-    ],
-    [
-     513,
-     165
-    ],
-    [
-     513,
-     185
-    ],
-    [
-     477,
-     185
-    ]
-   ],
-   "text": "359",
-   "conf": 0.6821
+   "conf": 0.6999
   },
   {
    "bbox": [
@@ -207,7 +185,7 @@
     ]
    ],
    "text": "dream come true_but it's",
-   "conf": 0.673
+   "conf": 0.6888
   },
   {
    "bbox": [
@@ -229,7 +207,7 @@
     ]
    ],
    "text": "See more",
-   "conf": 0.9478
+   "conf": 0.9541
   },
   {
    "bbox": [
@@ -256,28 +234,6 @@
   {
    "bbox": [
     [
-     480,
-     262
-    ],
-    [
-     510,
-     262
-    ],
-    [
-     510,
-     286
-    ],
-    [
-     480,
-     286
-    ]
-   ],
-   "text": "38",
-   "conf": 1.0
-  },
-  {
-   "bbox": [
-    [
      45,
      273
     ],
@@ -295,7 +251,7 @@
     ]
    ],
    "text": "moted MMusic cr",
-   "conf": 0.7474
+   "conf": 0.7639
   },
   {
    "bbox": [
@@ -317,7 +273,7 @@
     ]
    ],
    "text": "Promotesiness",
-   "conf": 0.6783
+   "conf": 0.6866
   },
   {
    "bbox": [
@@ -339,7 +295,7 @@
     ]
    ],
    "text": "Learn more",
-   "conf": 0.9991
+   "conf": 0.9989
   },
   {
    "bbox": [
@@ -383,7 +339,7 @@
     ]
    ],
    "text": "Friends",
-   "conf": 0.9939
+   "conf": 0.9948
   },
   {
    "bbox": [
@@ -405,30 +361,7 @@
     ]
    ],
    "text": "Inbox",
-   "conf": 0.9995
-  },
-  {
-   "bbox": [
-    [
-     459,
-     453
-    ],
-    [
-     513,
-     453
-    ],
-    [
-     513,
-     469
-    ],
-    [
-     459,
-     469
-    ]
-   ],
-   "text": "Profile",
-   "conf": 0.6515
+   "conf": 0.9996
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -30,8 +30,8 @@
      13
     ]
    ],
-   "text": "T D d(",
-   "conf": 0.0108
+   "text": "T D D(",
+   "conf": 0.0095
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "STREAM",
-   "conf": 0.9597
+   "conf": 0.787
   },
   {
    "bbox": [
@@ -74,8 +74,8 @@
      46
     ]
    ],
-   "text": "NOow",
-   "conf": 0.2409
+   "text": "Now",
+   "conf": 0.5844
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9985
+   "conf": 0.9981
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "cravecanada",
-   "conf": 0.9251
+   "conf": 0.9018
   },
   {
    "bbox": [
@@ -141,20 +141,20 @@
     ]
    ],
    "text": "1-16",
-   "conf": 0.9511
+   "conf": 0.9517
   },
   {
    "bbox": [
     [
      11,
-     431
+     432
     ],
     [
-     509,
-     431
+     445,
+     432
     ],
     [
-     509,
+     445,
      451
     ],
     [
@@ -162,9 +162,8 @@
      451
     ]
    ],
-   "text": "It's the off-season, baby! A new season of Shoresy is now streaming _ more",
-   "conf": 0.3719
+   "text": "It's the off-season, babyl Anew season of Shoresy is nOW streamint",
+   "conf": 0.4549
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

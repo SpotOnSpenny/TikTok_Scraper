@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9997
+   "conf": 0.9995
   },
   {
    "bbox": [
@@ -75,30 +75,29 @@
     ]
    ],
    "text": "1-22",
-   "conf": 0.4915
+   "conf": 0.5548
   },
   {
    "bbox": [
     [
-     11,
-     432
+     9,
+     431
     ],
     [
-     499,
-     432
+     445,
+     431
     ],
     [
-     499,
-     453
+     445,
+     451
     ],
     [
-     11,
-     453
+     9,
+     451
     ]
    ],
-   "text": "All the dreamy duvet colours are back, shop now before they sell out again!",
-   "conf": 0.6881
+   "text": "All the dreamy duvet colours are back, shop now before they sell OL",
+   "conf": 0.7777
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

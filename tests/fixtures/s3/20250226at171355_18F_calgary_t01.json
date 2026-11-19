@@ -5,34 +5,12 @@
   534,
   948
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  534,
+  453,
   474
  ],
  "detections": [
-  {
-   "bbox": [
-    [
-     466,
-     72
-    ],
-    [
-     522,
-     72
-    ],
-    [
-     522,
-     96
-    ],
-    [
-     466,
-     96
-    ]
-   ],
-   "text": "3,003",
-   "conf": 0.785
-  },
   {
    "bbox": [
     [
@@ -53,39 +31,17 @@
     ]
    ],
    "text": "Pro Hockey Life",
-   "conf": 0.748
-  },
-  {
-   "bbox": [
-    [
-     479,
-     215
-    ],
-    [
-     509,
-     215
-    ],
-    [
-     509,
-     235
-    ],
-    [
-     479,
-     235
-    ]
-   ],
-   "text": "116",
-   "conf": 0.9923
+   "conf": 0.7825
   },
   {
    "bbox": [
     [
      14,
-     222
+     224
     ],
     [
      386,
-     222
+     224
     ],
     [
      386,
@@ -97,7 +53,7 @@
     ]
    ],
    "text": "ASMR Gold: The Best Hockey Sounds",
-   "conf": 0.7729
+   "conf": 0.8941
   },
   {
    "bbox": [
@@ -119,7 +75,7 @@
     ]
    ],
    "text": "in the Shooting Lane",
-   "conf": 0.9342
+   "conf": 0.9294
   },
   {
    "bbox": [
@@ -141,29 +97,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.7815
-  },
-  {
-   "bbox": [
-    [
-     483,
-     299
-    ],
-    [
-     507,
-     299
-    ],
-    [
-     507,
-     317
-    ],
-    [
-     483,
-     317
-    ]
-   ],
-   "text": "12",
-   "conf": 0.5616
+   "conf": 0.7768
   },
   {
    "bbox": [
@@ -185,7 +119,7 @@
     ]
    ],
    "text": "Learn more",
-   "conf": 0.9982
+   "conf": 0.9985
   },
   {
    "bbox": [
@@ -228,8 +162,8 @@
      465
     ]
    ],
-   "text": "Friends ",
-   "conf": 0.634
+   "text": "Friends",
+   "conf": 0.9863
   },
   {
    "bbox": [
@@ -251,29 +185,7 @@
     ]
    ],
    "text": "Inbox",
-   "conf": 0.8662
-  },
-  {
-   "bbox": [
-    [
-     457,
-     449
-    ],
-    [
-     505,
-     449
-    ],
-    [
-     505,
-     465
-    ],
-    [
-     457,
-     465
-    ]
-   ],
-   "text": "Profile",
-   "conf": 1.0
+   "conf": 0.9975
   },
   {
    "bbox": [
@@ -295,8 +207,7 @@
     ]
    ],
    "text": "00",
-   "conf": 0.5074
+   "conf": 0.5726
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

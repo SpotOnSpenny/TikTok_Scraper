@@ -5,55 +5,33 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
   {
    "bbox": [
     [
-     423,
-     21
-    ],
-    [
-     519,
-     21
-    ],
-    [
-     519,
-     61
-    ],
-    [
-     423,
-     61
-    ]
-   ],
-   "text": "POIN",
-   "conf": 0.9998
-  },
-  {
-   "bbox": [
-    [
      398,
-     69
+     70
     ],
     [
-     524,
-     69
+     445,
+     70
     ],
     [
-     524,
-     119
+     445,
+     118
     ],
     [
      398,
-     119
+     118
     ]
    ],
-   "text": "SCISSC",
-   "conf": 0.9979
+   "text": "SC",
+   "conf": 0.9977
   },
   {
    "bbox": [
@@ -75,51 +53,29 @@
     ]
    ],
    "text": "Hair Straightener 4 Gear",
-   "conf": 0.8013
-  },
-  {
-   "bbox": [
-    [
-     454,
-     120
-    ],
-    [
-     522,
-     120
-    ],
-    [
-     522,
-     168
-    ],
-    [
-     454,
-     168
-    ]
-   ],
-   "text": "ND_",
-   "conf": 0.5083
+   "conf": 0.6441
   },
   {
    "bbox": [
     [
      73,
-     158
+     157
     ],
     [
-     521,
-     158
+     445,
+     157
     ],
     [
-     521,
-     201
+     445,
+     200
     ],
     [
      73,
-     201
+     200
     ]
    ],
-   "text": "Adjustable Temp Wide Panel ORTA",
-   "conf": 0.5632
+   "text": "Adjustable Temp Wide Pane",
+   "conf": 0.8235
   },
   {
    "bbox": [
@@ -128,11 +84,11 @@
      202
     ],
     [
-     516,
+     442,
      202
     ],
     [
-     516,
+     442,
      228
     ],
     [
@@ -140,8 +96,8 @@
      228
     ]
    ],
-   "text": "EASY AND EFFORTLESS TO",
-   "conf": 0.765
+   "text": "EASY AND EFFORTL",
+   "conf": 0.9956
   },
   {
    "bbox": [
@@ -185,7 +141,7 @@
     ]
    ],
    "text": "L",
-   "conf": 0.0895
+   "conf": 0.0732
   },
   {
    "bbox": [
@@ -194,11 +150,11 @@
      346
     ],
     [
-     524,
+     432,
      346
     ],
     [
-     524,
+     432,
      398
     ],
     [
@@ -206,8 +162,8 @@
      398
     ]
    ],
-   "text": "Lpongetx TENSION POWER COR",
-   "conf": 0.3011
+   "text": "Lponsotx TENSION POWER",
+   "conf": 0.3236
   },
   {
    "bbox": [
@@ -229,12 +185,12 @@
     ]
    ],
    "text": "LMLYRRSAL",
-   "conf": 0.3815
+   "conf": 0.424
   },
   {
    "bbox": [
     [
-     107,
+     65,
      433
     ],
     [
@@ -246,12 +202,12 @@
      451
     ],
     [
-     107,
+     65,
      451
     ]
    ],
-   "text": "unmanageable hail ?",
-   "conf": 0.6906
+   "text": "frizzY; unmanageable hail?",
+   "conf": 0.5281
   },
   {
    "bbox": [
@@ -273,7 +229,7 @@
     ]
    ],
    "text": "PUIG",
-   "conf": 0.3382
+   "conf": 0.3592
   },
   {
    "bbox": [
@@ -295,7 +251,7 @@
     ]
    ],
    "text": "Our ",
-   "conf": 0.6912
+   "conf": 0.4548
   },
   {
    "bbox": [
@@ -304,11 +260,11 @@
      433
     ],
     [
-     463,
+     445,
      433
     ],
     [
-     463,
+     445,
      451
     ],
     [
@@ -316,31 +272,30 @@
      451
     ]
    ],
-   "text": "Hair Straighten _",
-   "conf": 0.6304
+   "text": "Hair Straighter",
+   "conf": 0.7788
   },
   {
    "bbox": [
     [
-     471,
-     435
+     45,
+     49
     ],
     [
-     509,
-     435
+     75,
+     45
     ],
     [
-     509,
-     449
+     77,
+     59
     ],
     [
-     471,
-     449
+     47,
+     63
     ]
    ],
-   "text": "more",
-   "conf": 0.9411
+   "text": "3~",
+   "conf": 0.0116
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

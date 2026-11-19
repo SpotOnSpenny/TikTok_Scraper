@@ -17,12 +17,11 @@ import win32ui
 import cv2
 import easyocr
 import boto3
-from fuzzywuzzy import fuzz
 
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
 from tiktok_scraper.Core.processing import stitch_video
-from tiktok_scraper.Core.impression import match_label, screen_text, same_video
+from tiktok_scraper.Core.impression import match_label, screen_text, same_video, read_region
 
 #######################################################################################
 #                                        Notes:                                       #
@@ -30,8 +29,8 @@ from tiktok_scraper.Core.impression import match_label, screen_text, same_video
 
 ctypes.windll.user32.SetProcessDPIAware()
 reader = easyocr.Reader(['en'], gpu=False, verbose=False)
-# The video count at which the trim/refresh housekeeping last ran
-housekeeping = {"done_at": None}
+# After this many swipes in a row that do not change the video, press back and refresh the feed
+STUCK_SWIPE_LIMIT = 5
 
 @contextlib.contextmanager
 def gdi_context(dcObj, cDC, wDC, dataBitMap, hwnd):
@@ -82,25 +81,29 @@ def leave_video(hwnd, rect, impression_log):
     # Swipe away from the video on screen and record the swipe against its impression
     swipe = scroll_down(hwnd, rect)
     impression_log.note_swipe(time.time(), swipe)
+    swipes = impression_log.swipe_count()
 
-    # Housekeeping runs once per counted video, so a swipe that fails and is repeated does not repeat it
-    videos_watched = monitoring_data["videos_watched"]
-    if videos_watched == 0 or videos_watched == housekeeping["done_at"]:
-        return
-    housekeeping["done_at"] = videos_watched
+    if swipes == 1:
+        # First swipe away from a counted video: the routine housekeeping, once per video
+        # Trim the memory if it's been 25 videos
+        # We trim twice since the first time sometimes just registers the hotkey, the second removes the memory
+        if monitoring_data["videos_watched"] % 25 == 0:
+            trim_mem()
+            time.sleep(1)
+            trim_mem()
+            time.sleep(1)
 
-    # Trim the memory if it's been 25 videos
-    # We trim twice since the first time sometimes just registers the hotkey, the second removes the memory
-    if videos_watched % 25 == 0:
-        trim_mem()
-        time.sleep(1)
-        trim_mem()
-        time.sleep(1)
-
-    # Every 150 videos send CTRL + SHIFT + 2 and wait 10 seconds to hit the back button and refresh the feed
-    if videos_watched % 150 == 0:
+        # Every 150 videos send CTRL + SHIFT + 2 and wait 10 seconds to hit the back button and refresh the feed
+        if monitoring_data["videos_watched"] % 150 == 0:
+            time.sleep(2)
+            refresh_feed()
+            time.sleep(10)
+    elif swipes % STUCK_SWIPE_LIMIT == 0:
+        # The feed is stuck (pop-up, frozen video): the swipes are not changing what is on screen
+        print(f"Feed has not moved after {swipes} swipes, refreshing")
         time.sleep(2)
         refresh_feed()
+        impression_log.note_refresh()
         time.sleep(10)
 
 def find_bluestacks_ad(hwnd, impression_log):
@@ -113,28 +116,36 @@ def find_bluestacks_ad(hwnd, impression_log):
         start_time = time.time()
 
         # Read the screen once; the same OCR results feed the label check, the swipe check and the log
-        image, results, ocr_ms = read_screen(hwnd, rect)
+        image, results, region_height, ocr_ms = read_screen(hwnd, rect)
         scoring_start = time.perf_counter()
         flag, score, matched_text = match_label(results)
-        text = screen_text(results, width=image.shape[1])
+        text = screen_text(results, height=region_height)
         previous_text = impression_log.current_text()
         same = same_video(previous_text, text) if previous_text is not None else False
         scoring_ms = round((time.perf_counter() - scoring_start) * 1000, 1)
 
         if same is True:
-            # The text on screen has not changed, so the last swipe did not advance. Swipe again without counting.
-            print("Swipe not confirmed at index: " + str(monitoring_data["data_index"]) + ", swiping again")
-            leave_video(hwnd, rect, impression_log)
+            impression_log.note_read()
+            if flag is not None and not impression_log.is_ad():
+                # Same video as before, but the label is on screen now: it rendered late, or this was
+                # wrongly judged the same. Either way an ad is showing that has not been captured.
+                print("Ad found on a later read at index: " + str(monitoring_data["data_index"]))
+                impression_log.mark_ad(flag, score, matched_text)
+                ad_found = True
+            else:
+                # The text on screen has not changed, so the last swipe did not advance. Swipe again without counting.
+                print("Swipe not confirmed at index: " + str(monitoring_data["data_index"]) + ", swiping again")
+                leave_video(hwnd, rect, impression_log)
         else:
             # A new video: write the row for the one just left, count this one and store its frame.
-            # same is None when neither read had any text; it is counted but flagged as unconfirmed.
+            # A read with no text is still counted, but flagged, since nothing shows that the video changed.
             if impression_log.has_open():
                 impression_log.close("advanced")
                 monitoring_data["data_index"] += 1
             monitoring_data["videos_watched"] += 1
             frame_path = impression_log.next_frame_path()
             cv2.imwrite(frame_path, image, [cv2.IMWRITE_JPEG_QUALITY, 80])
-            impression_log.open(start_time, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=same is not None)
+            impression_log.open(start_time, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=len(text["lines"]) > 0)
             if flag is not None:
                 print("Ad found at index: " + str(monitoring_data["data_index"]))
                 ad_found = True
@@ -167,26 +178,20 @@ def take_screencaps(hwnd, rect, file_name):
     return 
 
 def read_screen(hwnd, rect):
-    # Returns (full-window image, EasyOCR results for the lower half, OCR time in ms)
+    # Returns (full-window image, EasyOCR results for the read region, height of that region, OCR time in ms)
     check_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ad_check_screencap")
     screencap_path = os.path.join(check_folder, "screencap.png")
     take_screencaps(hwnd, rect, screencap_path)
     image = cv2.imread(screencap_path)
 
-    # Read the lower half of the window at full width, where the account, the whole caption and the
-    # "Sponsored" badge sit. The colour image is read as it is: on the S3 ad frames an Otsu threshold
-    # lost the label in about a third of frames, and the left half alone cut the captions short.
+    # Read the lower half of the window, where the account, the whole caption and the "Sponsored" badge
+    # sit, without the right-hand count rail. The colour image is read as it is: on the S3 ad frames an
+    # Otsu threshold lost the label in about a third of frames, and the left half alone cut the captions short.
     ocr_start = time.perf_counter()
-    h = image.shape[0] // 2
-    results = reader.readtext(image[h:h*2, :])
+    region = read_region(image)
+    results = reader.readtext(region)
     ocr_ms = round((time.perf_counter() - ocr_start) * 1000, 1)
-    return image, results, ocr_ms
-
-def check_for_ad(hwnd, rect):
-    # Kept for callers that only need the yes/no answer
-    _, results, _ = read_screen(hwnd, rect)
-    flag, _, _ = match_label(results)
-    return flag is not None
+    return image, results, region.shape[0], ocr_ms
 
 def capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, job_queue, impression_log):
     try:

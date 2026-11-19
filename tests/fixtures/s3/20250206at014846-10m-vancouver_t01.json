@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -15,14 +15,14 @@
    "bbox": [
     [
      50,
-     58
+     59
     ],
     [
-     463,
-     58
+     445,
+     59
     ],
     [
-     463,
+     445,
      110
     ],
     [
@@ -30,8 +30,8 @@
      110
     ]
    ],
-   "text": "OF THE GOODS: STRAIGHT POWDER",
-   "conf": 0.9124
+   "text": "OF THE GOODS: STRAIGHT POWDEF",
+   "conf": 0.8934
   },
   {
    "bbox": [
@@ -53,29 +53,29 @@
     ]
    ],
    "text": "DI ^Ck",
-   "conf": 0.3212
+   "conf": 0.3269
   },
   {
    "bbox": [
     [
-     392,
-     112
+     393,
+     117
     ],
     [
-     486,
-     112
+     435,
+     117
     ],
     [
-     486,
-     138
+     435,
+     137
     ],
     [
-     392,
-     138
+     393,
+     137
     ]
    ],
-   "text": "   TE",
-   "conf": 0.4863
+   "text": "",
+   "conf": 0.0
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "Hair Straightener 4 Gear",
-   "conf": 0.9837
+   "conf": 0.9876
   },
   {
    "bbox": [
@@ -106,11 +106,11 @@
      158
     ],
     [
-     455,
+     445,
      158
     ],
     [
-     455,
+     445,
      197
     ],
     [
@@ -118,30 +118,30 @@
      197
     ]
    ],
-   "text": "Adjustable Temp Wide Panel",
-   "conf": 0.9999
+   "text": "Adjustable Temp Wide Pane",
+   "conf": 0.8873
   },
   {
    "bbox": [
     [
-     57,
-     190
+     58,
+     197
     ],
     [
-     502,
-     190
+     443,
+     197
     ],
     [
-     502,
-     243
+     443,
+     242
     ],
     [
-     57,
-     243
+     58,
+     242
     ]
    ],
-   "text": "HAIRSTYLE: STRAIGHT AND CUKLY HIAIR",
-   "conf": 0.7706
+   "text": "HAIRSTYLE: STRAIGHT AND CUKLY",
+   "conf": 0.6511
   },
   {
    "bbox": [
@@ -163,7 +163,7 @@
     ]
    ],
    "text": "HEAT UP: HEAT UP QUICKLY FOR 30 SECONDS",
-   "conf": 0.4548
+   "conf": 0.4376
   },
   {
    "bbox": [
@@ -185,7 +185,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9993
+   "conf": 0.9983
   },
   {
    "bbox": [
@@ -207,7 +207,7 @@
     ]
    ],
    "text": "Swiftcart",
-   "conf": 0.9679
+   "conf": 0.9449
   },
   {
    "bbox": [
@@ -229,52 +229,29 @@
     ]
    ],
    "text": "3d ago",
-   "conf": 0.4063
+   "conf": 0.4429
   },
   {
    "bbox": [
     [
-     8,
+     10,
      430
     ],
     [
-     464,
+     445,
      430
     ],
     [
-     464,
+     445,
      456
     ],
     [
-     8,
+     10,
      456
     ]
    ],
-   "text": "Tired of frizzy; unmanageable hair? Our UltraSmooth Hair Straighten __",
-   "conf": 0.7092
-  },
-  {
-   "bbox": [
-    [
-     471,
-     435
-    ],
-    [
-     509,
-     435
-    ],
-    [
-     509,
-     449
-    ],
-    [
-     471,
-     449
-    ]
-   ],
-   "text": "more",
-   "conf": 0.8126
+   "text": "Tired of frizzy; unmanageable hair? Our UltraSmooth Hair Straighter",
+   "conf": 0.811
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

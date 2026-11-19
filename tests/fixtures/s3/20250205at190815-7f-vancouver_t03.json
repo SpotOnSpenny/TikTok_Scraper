@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,17 +31,17 @@
     ]
    ],
    "text": "XRP",
-   "conf": 0.9991
+   "conf": 0.9992
   },
   {
    "bbox": [
     [
      92,
-     128
+     130
     ],
     [
      180,
-     128
+     130
     ],
     [
      180,
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "Now",
-   "conf": 0.4397
+   "conf": 0.5199
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "S1.37",
-   "conf": 0.756
+   "conf": 0.7828
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "S725",
-   "conf": 0.9307
+   "conf": 0.9225
   },
   {
    "bbox": [
@@ -141,12 +141,12 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9936
+   "conf": 0.9915
   },
   {
    "bbox": [
     [
-     11,
+     10,
      381
     ],
     [
@@ -155,15 +155,15 @@
     ],
     [
      255,
-     401
+     402
     ],
     [
-     11,
-     401
+     10,
+     402
     ]
    ],
    "text": "Cryptocuarrency Investing Academy",
-   "conf": 0.9242
+   "conf": 0.9652
   },
   {
    "bbox": [
@@ -185,7 +185,7 @@
     ]
    ],
    "text": "Sh ago",
-   "conf": 0.628
+   "conf": 0.6347
   },
   {
    "bbox": [
@@ -194,11 +194,11 @@
      410
     ],
     [
-     459,
+     445,
      410
     ],
     [
-     459,
+     445,
      428
     ],
     [
@@ -206,35 +206,13 @@
      428
     ]
    ],
-   "text": "Leamn how to select currencies and achieve a 94.719 ROI in less than",
-   "conf": 0.5928
+   "text": "Learn how to select currencies and achieve a 94.719 ROI in less tha",
+   "conf": 0.6346
   },
   {
    "bbox": [
     [
-     467,
-     411
-    ],
-    [
-     513,
-     411
-    ],
-    [
-     513,
-     427
-    ],
-    [
-     467,
-     427
-    ]
-   ],
-   "text": "month",
-   "conf": 0.9993
-  },
-  {
-   "bbox": [
-    [
-     33,
+     15,
      431
     ],
     [
@@ -246,13 +224,12 @@
      447
     ],
     [
-     33,
+     15,
      447
     ]
    ],
-   "text": "Promoted Music",
-   "conf": 0.9995
+   "text": "n Promoted Music",
+   "conf": 0.8883
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

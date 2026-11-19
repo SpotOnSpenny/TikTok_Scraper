@@ -5,34 +5,12 @@
   554,
   984
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  554,
+  470,
   492
  ],
  "detections": [
-  {
-   "bbox": [
-    [
-     501,
-     73
-    ],
-    [
-     533,
-     73
-    ],
-    [
-     533,
-     89
-    ],
-    [
-     501,
-     89
-    ]
-   ],
-   "text": "280",
-   "conf": 0.9384
-  },
   {
    "bbox": [
     [
@@ -53,7 +31,7 @@
     ]
    ],
    "text": "@vanscanada",
-   "conf": 0.9421
+   "conf": 0.7847
   },
   {
    "bbox": [
@@ -75,7 +53,7 @@
     ]
    ],
    "text": "Feel Something News The @ld Skool",
-   "conf": 0.6241
+   "conf": 0.6691
   },
   {
    "bbox": [
@@ -97,7 +75,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9994
+   "conf": 0.9995
   },
   {
    "bbox": [
@@ -119,7 +97,7 @@
     ]
    ],
    "text": "J moted Music",
-   "conf": 0.5453
+   "conf": 0.518
   },
   {
    "bbox": [
@@ -146,46 +124,24 @@
   {
    "bbox": [
     [
-     175,
-     363
+     173,
+     361
     ],
     [
      263,
-     363
+     361
     ],
     [
      263,
      381
     ],
     [
-     175,
+     173,
      381
     ]
    ],
    "text": "Learn more",
-   "conf": 0.9943
-  },
-  {
-   "bbox": [
-    [
-     152,
-     434
-    ],
-    [
-     182,
-     434
-    ],
-    [
-     182,
-     460
-    ],
-    [
-     152,
-     460
-    ]
-   ],
-   "text": "Qq",
-   "conf": 0.1173
+   "conf": 0.9983
   },
   {
    "bbox": [
@@ -207,7 +163,7 @@
     ]
    ],
    "text": "Home",
-   "conf": 0.9995
+   "conf": 0.9994
   },
   {
    "bbox": [
@@ -229,52 +185,29 @@
     ]
    ],
    "text": "Friends",
-   "conf": 0.8808
-  },
-  {
-   "bbox": [
-    [
-     369,
-     467
-    ],
-    [
-     407,
-     467
-    ],
-    [
-     407,
-     481
-    ],
-    [
-     369,
-     481
-    ]
-   ],
-   "text": "Inbox",
    "conf": 0.9999
   },
   {
    "bbox": [
     [
-     479,
-     465
+     369,
+     467
     ],
     [
-     521,
-     465
+     407,
+     467
     ],
     [
-     521,
-     481
+     407,
+     479
     ],
     [
-     479,
-     481
+     369,
+     479
     ]
    ],
-   "text": "Profile",
-   "conf": 0.9896
+   "text": "Inbox",
+   "conf": 0.9998
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

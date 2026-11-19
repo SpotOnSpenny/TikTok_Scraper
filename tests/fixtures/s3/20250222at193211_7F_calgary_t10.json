@@ -5,60 +5,16 @@
   540,
   960
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  540,
+  459,
   480
  ],
  "detections": [
   {
    "bbox": [
     [
-     474,
-     54
-    ],
-    [
-     524,
-     54
-    ],
-    [
-     524,
-     78
-    ],
-    [
-     474,
-     78
-    ]
-   ],
-   "text": "2,158",
-   "conf": 0.8061
-  },
-  {
-   "bbox": [
-    [
-     487,
-     131
-    ],
-    [
-     513,
-     131
-    ],
-    [
-     513,
-     151
-    ],
-    [
-     487,
-     151
-    ]
-   ],
-   "text": "35",
-   "conf": 1.0
-  },
-  {
-   "bbox": [
-    [
-     14,
+     16,
      140
     ],
     [
@@ -70,12 +26,12 @@
      172
     ],
     [
-     14,
+     16,
      172
     ]
    ],
    "text": "TheraBreath Canada",
-   "conf": 0.5222
+   "conf": 0.7207
   },
   {
    "bbox": [
@@ -97,29 +53,7 @@
     ]
    ],
    "text": "No more avoiding fave foodsldrinks",
-   "conf": 0.6795
-  },
-  {
-   "bbox": [
-    [
-     481,
-     207
-    ],
-    [
-     519,
-     207
-    ],
-    [
-     519,
-     227
-    ],
-    [
-     481,
-     227
-    ]
-   ],
-   "text": "299",
-   "conf": 1.0
+   "conf": 0.7333
   },
   {
    "bbox": [
@@ -141,7 +75,7 @@
     ]
    ],
    "text": "because staining-TheraBreath",
-   "conf": 0.8896
+   "conf": 0.8874
   },
   {
    "bbox": [
@@ -163,7 +97,7 @@
     ]
    ],
    "text": "Whiteningis in Canada Try it TODAY",
-   "conf": 0.9115
+   "conf": 0.9112
   },
   {
    "bbox": [
@@ -185,29 +119,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.99
-  },
-  {
-   "bbox": [
-    [
-     487,
-     291
-    ],
-    [
-     513,
-     291
-    ],
-    [
-     513,
-     311
-    ],
-    [
-     487,
-     311
-    ]
-   ],
-   "text": "30",
-   "conf": 1.0
+   "conf": 0.8709
   },
   {
    "bbox": [
@@ -229,29 +141,7 @@
     ]
    ],
    "text": "Shop now",
-   "conf": 0.9967
-  },
-  {
-   "bbox": [
-    [
-     477,
-     351
-    ],
-    [
-     507,
-     351
-    ],
-    [
-     507,
-     365
-    ],
-    [
-     477,
-     365
-    ]
-   ],
-   "text": "Kheraez",
-   "conf": 0.1171
+   "conf": 0.9968
   },
   {
    "bbox": [
@@ -317,30 +207,7 @@
     ]
    ],
    "text": "Inbox",
-   "conf": 0.9953
-  },
-  {
-   "bbox": [
-    [
-     461,
-     451
-    ],
-    [
-     513,
-     451
-    ],
-    [
-     513,
-     471
-    ],
-    [
-     461,
-     471
-    ]
-   ],
-   "text": "Profile",
-   "conf": 1.0
+   "conf": 0.9959
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

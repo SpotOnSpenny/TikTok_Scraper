@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Foot Size",
-   "conf": 0.9952
+   "conf": 0.998
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "na",
-   "conf": 0.9966
+   "conf": 0.997
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "ORDER",
-   "conf": 0.896
+   "conf": 0.9422
   },
   {
    "bbox": [
@@ -141,7 +141,7 @@
     ]
    ],
    "text": "Influencer Marketing",
-   "conf": 0.9009
+   "conf": 0.8997
   },
   {
    "bbox": [
@@ -163,12 +163,12 @@
     ]
    ],
    "text": "Id ago",
-   "conf": 0.521
+   "conf": 0.512
   },
   {
    "bbox": [
     [
-     11,
+     10,
      431
     ],
     [
@@ -180,13 +180,12 @@
      451
     ],
     [
-     11,
+     10,
      451
     ]
    ],
    "text": "Absolutely worth itl",
-   "conf": 0.9132
+   "conf": 0.8403
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

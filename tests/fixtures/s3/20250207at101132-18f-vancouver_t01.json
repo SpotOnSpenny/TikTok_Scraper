@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -59,11 +59,11 @@
    "bbox": [
     [
      137,
-     407
+     405
     ],
     [
      169,
-     407
+     405
     ],
     [
      169,
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "1-23",
-   "conf": 0.86
+   "conf": 0.9995
   },
   {
    "bbox": [
@@ -97,8 +97,7 @@
     ]
    ],
    "text": "Remove Distractions",
-   "conf": 0.9197
+   "conf": 0.8821
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

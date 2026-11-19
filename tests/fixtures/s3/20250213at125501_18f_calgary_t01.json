@@ -5,34 +5,12 @@
   520,
   924
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  520,
+  442,
   462
  ],
  "detections": [
-  {
-   "bbox": [
-    [
-     457,
-     13
-    ],
-    [
-     509,
-     13
-    ],
-    [
-     509,
-     33
-    ],
-    [
-     457,
-     33
-    ]
-   ],
-   "text": "608K",
-   "conf": 0.9436
-  },
   {
    "bbox": [
     [
@@ -40,11 +18,11 @@
      1
     ],
     [
-     217,
+     219,
      1
     ],
     [
-     217,
+     219,
      68
     ],
     [
@@ -53,39 +31,17 @@
     ]
    ],
    "text": "Ner",
-   "conf": 0.6914
-  },
-  {
-   "bbox": [
-    [
-     458,
-     84
-    ],
-    [
-     506,
-     84
-    ],
-    [
-     506,
-     108
-    ],
-    [
-     458,
-     108
-    ]
-   ],
-   "text": "1,572",
-   "conf": 0.8616
+   "conf": 0.5223
   },
   {
    "bbox": [
     [
      13,
-     121
+     117
     ],
     [
      373,
-     121
+     117
     ],
     [
      373,
@@ -96,30 +52,8 @@
      157
     ]
    ],
-   "text": "ShareThelleal: Charity Donate",
-   "conf": 0.7622
-  },
-  {
-   "bbox": [
-    [
-     473,
-     157
-    ],
-    [
-     507,
-     157
-    ],
-    [
-     507,
-     177
-    ],
-    [
-     473,
-     177
-    ]
-   ],
-   "text": "451",
-   "conf": 0.9897
+   "text": "ShareTheMeal: Charity Donate",
+   "conf": 0.9971
   },
   {
    "bbox": [
@@ -141,12 +75,12 @@
     ]
    ],
    "text": "Every act of kindness, no matter",
-   "conf": 0.8665
+   "conf": 0.8173
   },
   {
    "bbox": [
     [
-     12,
+     14,
      196
     ],
     [
@@ -158,12 +92,12 @@
      224
     ],
     [
-     12,
+     14,
      224
     ]
    ],
-   "text": "how small, can make a differencel",
-   "conf": 0.6978
+   "text": "how small; can make a differencel",
+   "conf": 0.7424
   },
   {
    "bbox": [
@@ -185,29 +119,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9999
-  },
-  {
-   "bbox": [
-    [
-     465,
-     237
-    ],
-    [
-     499,
-     237
-    ],
-    [
-     499,
-     257
-    ],
-    [
-     465,
-     257
-    ]
-   ],
-   "text": "949",
-   "conf": 0.5232
+   "conf": 1.0
   },
   {
    "bbox": [
@@ -229,7 +141,7 @@
     ]
    ],
    "text": "Download",
-   "conf": 0.9996
+   "conf": 0.9994
   },
   {
    "bbox": [
@@ -251,7 +163,7 @@
     ]
    ],
    "text": "TikTok isn't affiliated with this organization",
-   "conf": 0.6926
+   "conf": 0.8387
   },
   {
    "bbox": [
@@ -318,29 +230,6 @@
    ],
    "text": "Inbox",
    "conf": 0.9999
-  },
-  {
-   "bbox": [
-    [
-     445,
-     437
-    ],
-    [
-     493,
-     437
-    ],
-    [
-     493,
-     453
-    ],
-    [
-     445,
-     453
-    ]
-   ],
-   "text": "Profile",
-   "conf": 1.0
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

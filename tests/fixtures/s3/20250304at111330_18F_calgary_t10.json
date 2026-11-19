@@ -5,9 +5,9 @@
   534,
   950
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  534,
+  453,
   475
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "@Avocados from Mexico",
-   "conf": 0.79
+   "conf": 0.894
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "0",
-   "conf": 0.9778
+   "conf": 0.9775
   },
   {
    "bbox": [
@@ -62,64 +62,86 @@
      180
     ],
     [
-     384,
+     286,
      180
     ],
     [
-     384,
-     210
+     286,
+     206
     ],
     [
      76,
-     210
+     206
     ]
    ],
-   "text": "Plot twist: the star @f your next",
-   "conf": 0.7869
+   "text": "Plt twist: the star @f",
+   "conf": 0.8662
   },
   {
    "bbox": [
     [
-     19,
-     204
+     332,
+     182
     ],
     [
-     380,
-     204
+     384,
+     182
     ],
     [
-     380,
+     384,
+     206
+    ],
+    [
+     332,
+     206
+    ]
+   ],
+   "text": "next",
+   "conf": 0.9989
+  },
+  {
+   "bbox": [
+    [
+     20,
+     208
+    ],
+    [
+     382,
+     208
+    ],
+    [
+     382,
      236
     ],
     [
-     19,
+     20,
      236
     ]
    ],
    "text": "dinner party is a cauliflowerl Dressed",
-   "conf": 0.9258
+   "conf": 0.6579
   },
   {
    "bbox": [
     [
      18,
-     233
+     232
     ],
     [
      352,
-     233
+     232
     ],
     [
      352,
-     262
+     263
     ],
     [
      18,
-     262
+     263
     ]
    ],
    "text": "in a luxurious avocad@ cream, this",
-   "conf": 0.4487
+   "conf": 0.6965
   },
   {
    "bbox": [
@@ -141,7 +163,7 @@
     ]
    ],
    "text": "veggie steakis ready for i See more",
-   "conf": 0.6484
+   "conf": 0.6664
   },
   {
    "bbox": [
@@ -163,7 +185,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.998
+   "conf": 0.9981
   },
   {
    "bbox": [
@@ -207,24 +229,46 @@
     ]
    ],
    "text": "Promoted Musi",
-   "conf": 0.9953
+   "conf": 0.9964
   },
   {
    "bbox": [
     [
-     31,
-     449
+     147,
+     415
+    ],
+    [
+     163,
+     415
+    ],
+    [
+     163,
+     443
+    ],
+    [
+     147,
+     443
+    ]
+   ],
+   "text": "0",
+   "conf": 0.8539
+  },
+  {
+   "bbox": [
+    [
+     29,
+     447
     ],
     [
      79,
-     449
+     447
     ],
     [
      79,
      467
     ],
     [
-     31,
+     29,
      467
     ]
    ],
@@ -251,7 +295,7 @@
     ]
    ],
    "text": "Friends",
-   "conf": 0.9903
+   "conf": 0.9988
   },
   {
    "bbox": [
@@ -273,30 +317,29 @@
     ]
    ],
    "text": "Inbox",
-   "conf": 0.8972
+   "conf": 0.9118
   },
   {
    "bbox": [
     [
-     455,
-     447
+     281,
+     183
     ],
     [
-     507,
-     447
+     335,
+     178
     ],
     [
-     507,
-     467
+     336,
+     205
     ],
     [
-     455,
-     467
+     283,
+     210
     ]
    ],
-   "text": "Profile",
-   "conf": 0.9826
+   "text": "'yoUr",
+   "conf": 0.8016
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

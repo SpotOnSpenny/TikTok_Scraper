@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -18,11 +18,11 @@
      15
     ],
     [
-     329,
+     327,
      15
     ],
     [
-     329,
+     327,
      107
     ],
     [
@@ -31,17 +31,17 @@
     ]
    ],
    "text": "BTc",
-   "conf": 0.7808
+   "conf": 0.5955
   },
   {
    "bbox": [
     [
      92,
-     128
+     130
     ],
     [
      180,
-     128
+     130
     ],
     [
      180,
@@ -53,24 +53,24 @@
     ]
    ],
    "text": "Now",
-   "conf": 0.6494
+   "conf": 0.773
   },
   {
    "bbox": [
     [
-     340,
+     338,
      128
     ],
     [
-     438,
+     440,
      128
     ],
     [
-     438,
+     440,
      184
     ],
     [
-     340,
+     338,
      184
     ]
    ],
@@ -97,12 +97,12 @@
     ]
    ],
    "text": "S92500",
-   "conf": 0.9184
+   "conf": 0.9165
   },
   {
    "bbox": [
     [
-     239,
+     237,
      199
     ],
     [
@@ -111,37 +111,37 @@
     ],
     [
      281,
-     253
+     255
     ],
     [
-     239,
-     253
+     237,
+     255
     ]
    ],
    "text": "9)",
-   "conf": 0.9984
+   "conf": 0.9456
   },
   {
    "bbox": [
     [
-     307,
+     306,
      205
     ],
     [
-     471,
+     445,
      205
     ],
     [
-     471,
+     445,
      265
     ],
     [
-     307,
+     306,
      265
     ]
    ],
-   "text": "S151000",
-   "conf": 0.9454
+   "text": "S15100C",
+   "conf": 0.5754
   },
   {
    "bbox": [
@@ -163,12 +163,12 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9988
+   "conf": 0.9986
   },
   {
    "bbox": [
     [
-     11,
+     10,
      381
     ],
     [
@@ -177,15 +177,15 @@
     ],
     [
      255,
-     401
+     402
     ],
     [
-     11,
-     401
+     10,
+     402
     ]
    ],
    "text": "Cryptocuarrency Investing Academy",
-   "conf": 0.7859
+   "conf": 0.9471
   },
   {
    "bbox": [
@@ -207,51 +207,29 @@
     ]
    ],
    "text": "Sh ago",
-   "conf": 0.5771
+   "conf": 0.6167
   },
   {
    "bbox": [
     [
-     11,
-     411
-    ],
-    [
-     459,
-     411
-    ],
-    [
-     459,
-     427
-    ],
-    [
-     11,
-     427
-    ]
-   ],
-   "text": "Learn how tO select currencies and achieve a 94.719 ROI in less than",
-   "conf": 0.4466
-  },
-  {
-   "bbox": [
-    [
-     466,
+     10,
      410
     ],
     [
-     513,
+     445,
      410
     ],
     [
-     513,
+     445,
      428
     ],
     [
-     466,
+     10,
      428
     ]
    ],
-   "text": "month",
-   "conf": 0.9981
+   "text": "Learn how to select currencies and achieve a 94.719 ROI in less tha",
+   "conf": 0.612
   },
   {
    "bbox": [
@@ -273,8 +251,7 @@
     ]
    ],
    "text": "nJ Promoted Music",
-   "conf": 0.6682
+   "conf": 0.6806
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

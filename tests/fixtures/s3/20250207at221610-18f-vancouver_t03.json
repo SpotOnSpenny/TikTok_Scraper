@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9984
+   "conf": 0.9635
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "Invisaligno",
-   "conf": 0.7691
+   "conf": 0.6684
   },
   {
    "bbox": [
@@ -75,17 +75,17 @@
     ]
    ],
    "text": "2024-12-12",
-   "conf": 0.6798
+   "conf": 0.5512
   },
   {
    "bbox": [
     [
      11,
-     431
+     433
     ],
     [
      261,
-     431
+     433
     ],
     [
      261,
@@ -96,9 +96,8 @@
      451
     ]
    ],
-   "text": "Take the Invisaligne Smile Quiz Todayl",
-   "conf": 0.865
+   "text": "Take the Invisaligno Smile Quiz Todayl",
+   "conf": 0.8449
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

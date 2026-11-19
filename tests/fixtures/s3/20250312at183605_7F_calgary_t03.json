@@ -5,34 +5,12 @@
   554,
   984
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  554,
+  470,
   492
  ],
  "detections": [
-  {
-   "bbox": [
-    [
-     501,
-     73
-    ],
-    [
-     533,
-     73
-    ],
-    [
-     533,
-     89
-    ],
-    [
-     501,
-     89
-    ]
-   ],
-   "text": "280",
-   "conf": 0.7783
-  },
   {
    "bbox": [
     [
@@ -53,7 +31,7 @@
     ]
    ],
    "text": "@vanscanada",
-   "conf": 0.9772
+   "conf": 0.682
   },
   {
    "bbox": [
@@ -75,7 +53,7 @@
     ]
    ],
    "text": "Feel Something New: The Old Skool:",
-   "conf": 0.8732
+   "conf": 0.9026
   },
   {
    "bbox": [
@@ -119,7 +97,7 @@
     ]
    ],
    "text": "Music",
-   "conf": 0.8043
+   "conf": 0.9117
   },
   {
    "bbox": [
@@ -141,7 +119,7 @@
     ]
    ],
    "text": "Promoted Musii",
-   "conf": 0.96
+   "conf": 0.9553
   },
   {
    "bbox": [
@@ -155,15 +133,15 @@
     ],
     [
      263,
-     379
+     381
     ],
     [
      175,
-     379
+     381
     ]
    ],
    "text": "Learn more",
-   "conf": 0.9435
+   "conf": 0.9974
   },
   {
    "bbox": [
@@ -177,15 +155,15 @@
     ],
     [
      77,
-     481
+     479
     ],
     [
      37,
-     481
+     479
     ]
    ],
    "text": "Home",
-   "conf": 0.999
+   "conf": 0.8624
   },
   {
    "bbox": [
@@ -221,38 +199,15 @@
     ],
     [
      407,
-     481
+     479
     ],
     [
      369,
-     481
+     479
     ]
    ],
-   "text": "Inbox",
-   "conf": 0.9999
-  },
-  {
-   "bbox": [
-    [
-     479,
-     465
-    ],
-    [
-     521,
-     465
-    ],
-    [
-     521,
-     481
-    ],
-    [
-     479,
-     481
-    ]
-   ],
-   "text": "Profile",
-   "conf": 0.9913
+   "text": "IInbox",
+   "conf": 0.8624
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "XLM",
-   "conf": 0.3784
+   "conf": 0.4573
   },
   {
    "bbox": [
@@ -40,11 +40,11 @@
      130
     ],
     [
-     164,
+     166,
      130
     ],
     [
-     164,
+     166,
      182
     ],
     [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "Nul",
-   "conf": 0.3597
+   "conf": 0.1999
   },
   {
    "bbox": [
@@ -62,20 +62,20 @@
      130
     ],
     [
-     440,
+     438,
      130
     ],
     [
-     440,
-     184
+     438,
+     182
     ],
     [
      340,
-     184
+     182
     ]
    ],
    "text": "{2u25",
-   "conf": 0.3453
+   "conf": 0.1779
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "SO.43 ",
-   "conf": 0.4515
+   "conf": 0.4252
   },
   {
    "bbox": [
@@ -119,29 +119,29 @@
     ]
    ],
    "text": "2",
-   "conf": 0.9867
+   "conf": 0.9884
   },
   {
    "bbox": [
     [
-     328,
-     203
+     329,
+     204
     ],
     [
-     449,
-     203
+     445,
+     204
     ],
     [
-     449,
-     270
+     445,
+     269
     ],
     [
-     328,
-     270
+     329,
+     269
     ]
    ],
-   "text": "OUZD ",
-   "conf": 0.0594
+   "text": "OUzO",
+   "conf": 0.3446
   },
   {
    "bbox": [
@@ -163,7 +163,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9988
+   "conf": 0.998
   },
   {
    "bbox": [
@@ -185,7 +185,7 @@
     ]
    ],
    "text": "Cryptocuarrency Investing Academy",
-   "conf": 0.92
+   "conf": 0.839
   },
   {
    "bbox": [
@@ -207,51 +207,29 @@
     ]
    ],
    "text": "Sh ago",
-   "conf": 0.6236
+   "conf": 0.6475
   },
   {
    "bbox": [
     [
-     11,
-     411
+     10,
+     410
     ],
     [
-     459,
-     411
+     445,
+     410
     ],
     [
-     459,
-     427
+     445,
+     428
     ],
     [
-     11,
-     427
+     10,
+     428
     ]
    ],
-   "text": "Learn how to select currencies and achieve a 94.719 ROI in less than",
-   "conf": 0.518
-  },
-  {
-   "bbox": [
-    [
-     467,
-     411
-    ],
-    [
-     513,
-     411
-    ],
-    [
-     513,
-     427
-    ],
-    [
-     467,
-     427
-    ]
-   ],
-   "text": "month",
-   "conf": 0.999
+   "text": "Learn how to select currencies and achieve a 94.719 ROI in less tha",
+   "conf": 0.6931
   },
   {
    "bbox": [
@@ -272,9 +250,8 @@
      447
     ]
    ],
-   "text": "n Promoted Music",
-   "conf": 0.8878
+   "text": "nJ Promoted Music",
+   "conf": 0.6241
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

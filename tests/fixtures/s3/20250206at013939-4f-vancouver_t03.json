@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -15,14 +15,14 @@
    "bbox": [
     [
      113,
-     146
+     147
     ],
     [
-     412,
-     146
+     413,
+     147
     ],
     [
-     412,
+     413,
      189
     ],
     [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "That'$ why | enrolled",
-   "conf": 0.821
+   "conf": 0.6942
   },
   {
    "bbox": [
@@ -40,11 +40,11 @@
      190
     ],
     [
-     447,
+     445,
      190
     ],
     [
-     447,
+     445,
      233
     ],
     [
@@ -53,20 +53,20 @@
     ]
    ],
    "text": "in the MVP+ membership",
-   "conf": 0.9466
+   "conf": 0.9437
   },
   {
    "bbox": [
     [
      320,
-     282
+     281
     ],
     [
-     448,
-     282
+     445,
+     281
     ],
     [
-     448,
+     445,
      306
     ],
     [
@@ -74,8 +74,8 @@
      306
     ]
    ],
-   "text": "A € A D E M Y",
-   "conf": 0.4101
+   "text": "A € A D € M Y",
+   "conf": 0.4774
   },
   {
    "bbox": [
@@ -97,7 +97,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9995
+   "conf": 0.9997
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "NCSA_Sports",
-   "conf": 0.987
+   "conf": 0.9825
   },
   {
    "bbox": [
@@ -141,7 +141,7 @@
     ]
    ],
    "text": "2024-10-22",
-   "conf": 0.9384
+   "conf": 0.7502
   },
   {
    "bbox": [
@@ -163,8 +163,7 @@
     ]
    ],
    "text": "Unlock your full athletic potential with NCSA's MVP + Membership:",
-   "conf": 0.7288
+   "conf": 0.6447
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

@@ -3,13 +3,14 @@ import json
 import os
 
 # External Dependency Imports
+import numpy
 import pandas
 import pytest
 
 # Internal Dependency Imports
 from conftest import load_results, fixture_names, FIXTURE_DIR
 from tiktok_scraper.Core.impression import (
-    SPONSORED_FLAGS, match_label, screen_text, same_video, ImpressionLog
+    SPONSORED_FLAGS, match_label, screen_text, same_video, read_region, ImpressionLog
 )
 
 
@@ -85,6 +86,17 @@ def test_low_confidence_text_is_dropped():
     assert text_of("low_confidence_only") == {"account": "", "caption": "", "lines": []}
 
 
+def test_nav_bar_is_dropped_but_a_lookalike_account_is_kept():
+    text = screen_text(synthetic("nav_lookalike_account"), height=480)
+    assert text["lines"] == ["Homer", "Donut review number forty seven"]
+    assert text["account"] == "Homer"
+
+
+def test_read_region_is_lower_half_without_the_count_rail():
+    image = numpy.zeros((960, 540, 3), dtype=numpy.uint8)
+    assert read_region(image).shape == (480, 459, 3)
+
+
 # ---------------------------------- same_video -----------------------------------
 
 def test_reread_of_same_video_is_same():
@@ -119,8 +131,8 @@ needs_s3 = pytest.mark.skipif(not S3_NAMES, reason="no S3 fixtures yet")
 
 def s3_text(name):
     with open(os.path.join(FIXTURE_DIR, "s3", f"{name}.json"), encoding="utf-8") as file:
-        width = json.load(file)["crop_size"][0]
-    return screen_text(load_results("s3", name), width=width)
+        height = json.load(file)["crop_size"][1]
+    return screen_text(load_results("s3", name), height=height)
 
 
 def s3_groups():
@@ -214,6 +226,9 @@ def test_row_contents(tmp_path):
     assert row["matched_text"] == "Sponsored"
     assert row["swipe"] == {"x": 270, "y_start": 720, "y_end": 240}
     assert row["swipe_attempts"] == 1
+    assert row["label_read"] == 1
+    assert row["reads"] == 1
+    assert row["stuck_refreshes"] == 0
     assert row["advance_confirmed"] is True
     assert row["ocr_ms"] == 812.5
     assert row["frame_path"] == "frames/000001.jpg"
@@ -237,6 +252,22 @@ def test_failed_swipe_gives_one_row_with_two_attempts(tmp_path):
     assert rows[0]["swipe_attempts"] == 2
     assert rows[0]["dwell_s"] == 11.0
     assert rows[0]["swipe"] == {"x": 2}
+
+
+def test_late_label_turns_the_open_video_into_an_ad(tmp_path):
+    log = make_log(tmp_path)
+    open_video(log, "ordinary_a", 1000.0)
+    assert log.is_ad() is False
+    log.note_swipe(1005.0, {"x": 1})
+    log.note_read()
+    log.mark_ad("Sponsored", 100, "Sponsored")
+    assert log.is_ad() is True
+    log.close()
+    row = read_rows(log)[0]
+    assert row["is_ad"] is True
+    assert row["matched_label"] == "Sponsored"
+    assert row["label_read"] == 2
+    assert row["reads"] == 2
 
 
 def test_session_end_closes_the_open_video(tmp_path):

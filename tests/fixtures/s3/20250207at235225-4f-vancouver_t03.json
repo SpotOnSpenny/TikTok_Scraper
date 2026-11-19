@@ -5,55 +5,33 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
   {
    "bbox": [
     [
-     472,
-     18
-    ],
-    [
-     516,
-     18
-    ],
-    [
-     516,
-     44
-    ],
-    [
-     472,
-     44
-    ]
-   ],
-   "text": "SLUE",
-   "conf": 0.251
-  },
-  {
-   "bbox": [
-    [
-     14,
-     372
+     15,
+     373
     ],
     [
      91,
-     372
+     373
     ],
     [
      91,
      391
     ],
     [
-     14,
+     15,
      391
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9994
+   "conf": 0.9991
   },
   {
    "bbox": [
@@ -75,7 +53,7 @@
     ]
    ],
    "text": "cravecanada",
-   "conf": 0.9578
+   "conf": 0.9827
   },
   {
    "bbox": [
@@ -97,30 +75,29 @@
     ]
    ],
    "text": "1-16",
-   "conf": 0.9938
+   "conf": 0.9916
   },
   {
    "bbox": [
     [
-     8,
-     430
+     9,
+     431
     ],
     [
-     510,
-     430
+     445,
+     431
     ],
     [
-     510,
-     455
+     445,
+     452
     ],
     [
-     8,
-     455
+     9,
+     452
     ]
    ],
-   "text": "It's the off-season, baby! A new season of Shoresy is nOw streaming - more",
-   "conf": 0.5478
+   "text": "It's the off-season, babyl A new season of Shoresy is now streaming",
+   "conf": 0.6729
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

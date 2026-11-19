@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -23,15 +23,15 @@
     ],
     [
      91,
-     395
+     393
     ],
     [
      15,
-     395
+     393
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9991
+   "conf": 0.9996
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "Coursiv",
-   "conf": 0.9935
+   "conf": 0.9972
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "4h ago",
-   "conf": 0.8772
+   "conf": 0.8549
   },
   {
    "bbox": [
@@ -97,8 +97,7 @@
     ]
    ],
    "text": "Kickstart your Al journey with Coursiv!",
-   "conf": 0.7956
+   "conf": 0.7291
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

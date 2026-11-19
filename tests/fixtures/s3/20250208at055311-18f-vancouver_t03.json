@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -40,11 +40,11 @@
      407
     ],
     [
-     102,
+     103,
      407
     ],
     [
-     102,
+     103,
      423
     ],
     [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "hushblankets",
-   "conf": 0.9996
+   "conf": 0.9995
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "1-22",
-   "conf": 0.1204
+   "conf": 0.1885
   },
   {
    "bbox": [
@@ -84,21 +84,20 @@
      432
     ],
     [
-     499,
+     445,
      432
     ],
     [
-     499,
-     453
+     445,
+     451
     ],
     [
      11,
-     453
+     451
     ]
    ],
-   "text": "All the dreamy duvet colours are back, shop now before they sell out again!",
-   "conf": 0.7344
+   "text": "All the dreamy duvet colours are back, shop now before they sell OL",
+   "conf": 0.8373
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

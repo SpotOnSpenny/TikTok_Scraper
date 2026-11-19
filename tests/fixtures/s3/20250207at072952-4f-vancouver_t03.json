@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -31,7 +31,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9991
+   "conf": 0.9992
   },
   {
    "bbox": [
@@ -53,7 +53,7 @@
     ]
    ],
    "text": "dysoncanada",
-   "conf": 0.9999
+   "conf": 1.0
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "1-16",
-   "conf": 0.633
+   "conf": 0.9912
   },
   {
    "bbox": [
@@ -84,11 +84,11 @@
      432
     ],
     [
-     465,
+     445,
      432
     ],
     [
-     465,
+     445,
      452
     ],
     [
@@ -96,31 +96,8 @@
      452
     ]
    ],
-   "text": "Best-in-class noise cancellation. Enhanced sound range and designe __",
-   "conf": 0.8177
-  },
-  {
-   "bbox": [
-    [
-     471,
-     435
-    ],
-    [
-     509,
-     435
-    ],
-    [
-     509,
-     449
-    ],
-    [
-     471,
-     449
-    ]
-   ],
-   "text": "more",
-   "conf": 0.9888
+   "text": "Best-in-class noise cancellation. Enhanced sound range and design",
+   "conf": 0.7041
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

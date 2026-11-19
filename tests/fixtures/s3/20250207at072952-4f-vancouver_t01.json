@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -30,8 +30,8 @@
      35
     ]
    ],
-   "text": "TI//a>",
-   "conf": 0.0028
+   "text": "TUI//a>",
+   "conf": 0.0015
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9992
+   "conf": 0.9993
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "1-16",
-   "conf": 0.9433
+   "conf": 0.7569
   },
   {
    "bbox": [
@@ -128,11 +128,11 @@
      432
     ],
     [
-     465,
+     445,
      432
     ],
     [
-     465,
+     445,
      453
     ],
     [
@@ -140,31 +140,8 @@
      453
     ]
    ],
-   "text": "Best-in-class noise cancellation. Enhanced sound range and designe__",
-   "conf": 0.8056
-  },
-  {
-   "bbox": [
-    [
-     471,
-     435
-    ],
-    [
-     509,
-     435
-    ],
-    [
-     509,
-     449
-    ],
-    [
-     471,
-     449
-    ]
-   ],
-   "text": "more",
-   "conf": 0.9638
+   "text": "Best-in-class noise cancellation. Enhanced sound range and design",
+   "conf": 0.8478
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }

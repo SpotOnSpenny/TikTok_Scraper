@@ -5,9 +5,9 @@
   524,
   932
  ],
- "crop": "lower half, full width",
+ "crop": "read_region: lower half, right-hand count rail removed",
  "crop_size": [
-  524,
+  445,
   466
  ],
  "detections": [
@@ -30,8 +30,8 @@
      35
     ]
    ],
-   "text": "Juvujii",
-   "conf": 0.0281
+   "text": "Junvjii",
+   "conf": 0.0469
   },
   {
    "bbox": [
@@ -40,20 +40,20 @@
      0
     ],
     [
-     491,
+     445,
      0
     ],
     [
-     491,
-     35
+     445,
+     37
     ],
     [
      281,
-     35
+     37
     ]
    ],
-   "text": "Uuive",
-   "conf": 0.0706
+   "text": "OUi ",
+   "conf": 0.0254
   },
   {
    "bbox": [
@@ -75,7 +75,7 @@
     ]
    ],
    "text": "Sponsored",
-   "conf": 0.9997
+   "conf": 0.9996
   },
   {
    "bbox": [
@@ -119,7 +119,7 @@
     ]
    ],
    "text": "1-11",
-   "conf": 0.4094
+   "conf": 0.3578
   },
   {
    "bbox": [
@@ -141,8 +141,7 @@
     ]
    ],
    "text": "Like Like Love You is Out Nowl Check it outl",
-   "conf": 0.9142
+   "conf": 0.4009
   }
- ],
- "ocr_input": "colour crop, no threshold"
+ ]
 }
