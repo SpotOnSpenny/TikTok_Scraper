@@ -1,0 +1,10 @@
+# Development and test dependencies. Runs on any OS (no win32, no BlueStacks).
+# The tests need only the first four; easyocr and boto3 are for tools/make_fixtures.py.
+pytest
+fuzzywuzzy
+python-Levenshtein
+pandas
+opencv-python-headless
+python-dotenv
+boto3
+easyocr

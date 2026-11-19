@@ -1,0 +1,104 @@
+{
+ "source": "20250206at021457-7f-vancouver.mp4",
+ "frame_time_s": 10.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     15,
+     377
+    ],
+    [
+     91,
+     377
+    ],
+    [
+     91,
+     393
+    ],
+    [
+     15,
+     393
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9997
+  },
+  {
+   "bbox": [
+    [
+     11,
+     407
+    ],
+    [
+     153,
+     407
+    ],
+    [
+     153,
+     425
+    ],
+    [
+     11,
+     425
+    ]
+   ],
+   "text": "Influencer Marketing",
+   "conf": 0.7425
+  },
+  {
+   "bbox": [
+    [
+     159,
+     405
+    ],
+    [
+     209,
+     405
+    ],
+    [
+     209,
+     423
+    ],
+    [
+     159,
+     423
+    ]
+   ],
+   "text": "Id ago",
+   "conf": 0.6916
+  },
+  {
+   "bbox": [
+    [
+     10,
+     431
+    ],
+    [
+     141,
+     431
+    ],
+    [
+     141,
+     451
+    ],
+    [
+     10,
+     451
+    ]
+   ],
+   "text": "Absolutely worth itl",
+   "conf": 0.8916
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

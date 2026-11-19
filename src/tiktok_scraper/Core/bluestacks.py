@@ -22,14 +22,16 @@ from fuzzywuzzy import fuzz
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
 from tiktok_scraper.Core.processing import stitch_video
+from tiktok_scraper.Core.impression import match_label, screen_text, same_video
 
 #######################################################################################
 #                                        Notes:                                       #
 #######################################################################################
 
-sponsored_flags = ["Sponsored", "Paid Promotion", "Paid partnership" "Promoted Music"]
 ctypes.windll.user32.SetProcessDPIAware()
 reader = easyocr.Reader(['en'], gpu=False, verbose=False)
+# The video count at which the trim/refresh housekeeping last ran
+housekeeping = {"done_at": None}
 
 @contextlib.contextmanager
 def gdi_context(dcObj, cDC, wDC, dataBitMap, hwnd):
@@ -65,31 +67,43 @@ def find_bluestacks_window(window_name):
     return hwndChild
 
 def scroll_down(hwnd, rect):
-    global monitoring_data
+    # Sends the swipe and returns its parameters. Counting happens in find_bluestacks_ad,
+    # once the next read confirms the video changed.
     x = (rect[2] - rect[0]) // 2
     y = (rect[3] - rect[1]) // 4
     win32api.SetCursorPos((x, y*3))
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
     win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, 0, -(y*2), 0, 0)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
-    monitoring_data["data_index"] += 1
-    monitoring_data["videos_watched"] += 1
+    return {"x": x, "y_start": y*3, "y_end": y}
+
+def leave_video(hwnd, rect, impression_log):
+    global monitoring_data
+    # Swipe away from the video on screen and record the swipe against its impression
+    swipe = scroll_down(hwnd, rect)
+    impression_log.note_swipe(time.time(), swipe)
+
+    # Housekeeping runs once per counted video, so a swipe that fails and is repeated does not repeat it
+    videos_watched = monitoring_data["videos_watched"]
+    if videos_watched == 0 or videos_watched == housekeeping["done_at"]:
+        return
+    housekeeping["done_at"] = videos_watched
 
     # Trim the memory if it's been 25 videos
     # We trim twice since the first time sometimes just registers the hotkey, the second removes the memory
-    if monitoring_data["videos_watched"] % 25 == 0:
+    if videos_watched % 25 == 0:
         trim_mem()
         time.sleep(1)
         trim_mem()
         time.sleep(1)
-    
-    # Every 150 videos send CTRL + SHIFT + 2 and wait 10 seconds to hit the back button and refresh the feed 
-    if monitoring_data["videos_watched"] % 150 == 0:
+
+    # Every 150 videos send CTRL + SHIFT + 2 and wait 10 seconds to hit the back button and refresh the feed
+    if videos_watched % 150 == 0:
         time.sleep(2)
         refresh_feed()
         time.sleep(10)
 
-def find_bluestacks_ad(hwnd):
+def find_bluestacks_ad(hwnd, impression_log):
     global monitoring_data
     rect = win32gui.GetWindowRect(hwnd)
     ad_found = False
@@ -97,12 +111,36 @@ def find_bluestacks_ad(hwnd):
         time.sleep(1)
         # Start timer for process
         start_time = time.time()
-        if check_for_ad(hwnd, rect):
-            print("Ad found at index: " + str(monitoring_data["data_index"]))
-            ad_found = True
+
+        # Read the screen once; the same OCR results feed the label check, the swipe check and the log
+        image, results, ocr_ms = read_screen(hwnd, rect)
+        scoring_start = time.perf_counter()
+        flag, score, matched_text = match_label(results)
+        text = screen_text(results, width=image.shape[1])
+        previous_text = impression_log.current_text()
+        same = same_video(previous_text, text) if previous_text is not None else False
+        scoring_ms = round((time.perf_counter() - scoring_start) * 1000, 1)
+
+        if same is True:
+            # The text on screen has not changed, so the last swipe did not advance. Swipe again without counting.
+            print("Swipe not confirmed at index: " + str(monitoring_data["data_index"]) + ", swiping again")
+            leave_video(hwnd, rect, impression_log)
         else:
-            print("No ad found at index: " + str(monitoring_data["data_index"]))
-            scroll_down(hwnd, rect)
+            # A new video: write the row for the one just left, count this one and store its frame.
+            # same is None when neither read had any text; it is counted but flagged as unconfirmed.
+            if impression_log.has_open():
+                impression_log.close("advanced")
+                monitoring_data["data_index"] += 1
+            monitoring_data["videos_watched"] += 1
+            frame_path = impression_log.next_frame_path()
+            cv2.imwrite(frame_path, image, [cv2.IMWRITE_JPEG_QUALITY, 80])
+            impression_log.open(start_time, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=same is not None)
+            if flag is not None:
+                print("Ad found at index: " + str(monitoring_data["data_index"]))
+                ad_found = True
+            else:
+                print("No ad found at index: " + str(monitoring_data["data_index"]))
+                leave_video(hwnd, rect, impression_log)
         # End timer for process to nearest second
         end_time = time.time()
         time_elapsed = (end_time - start_time).__round__(2)
@@ -128,35 +166,29 @@ def take_screencaps(hwnd, rect, file_name):
 
     return 
 
-def check_for_ad(hwnd, rect):
-    # Take a screencap of the window
-    w = (rect[2] - rect[0]) // 2
-    h = (rect[3] - rect[1]) // 2
+def read_screen(hwnd, rect):
+    # Returns (full-window image, EasyOCR results for the lower half, OCR time in ms)
     check_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ad_check_screencap")
-    wDC = win32gui.GetWindowDC(hwnd)
-    dcObj=win32ui.CreateDCFromHandle(wDC)
-    cDC=dcObj.CreateCompatibleDC()
-    dataBitMap = win32ui.CreateBitmap()
-    dataBitMap.CreateCompatibleBitmap(dcObj, w, h)
-    cDC.SelectObject(dataBitMap)
-    with gdi_context(dcObj, cDC, wDC, dataBitMap, hwnd):
-        cDC.BitBlt((0,0),(w, h) , dcObj, (0,h), win32con.SRCCOPY)
-        dataBitMap.SaveBitmapFile(cDC, os.path.join(check_folder, "screencap.png"))
+    screencap_path = os.path.join(check_folder, "screencap.png")
+    take_screencaps(hwnd, rect, screencap_path)
+    image = cv2.imread(screencap_path)
 
-    # check the screencap for a "Sponsored" badge
-    image = cv2.imread(os.path.join(check_folder, "screencap.png"))
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, thresholded = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY +cv2.THRESH_OTSU)
-    result = reader.readtext(thresholded)
-    # Close the image to prevent memory leaks
-    cv2.destroyAllWindows()
-    #iterate through the result and check for "Sponsored"
-    for detection in result:
-        if any([fuzz.ratio(detection[1], flag) > 78 for flag in sponsored_flags]):
-            return True
-    return False
+    # Read the lower half of the window at full width, where the account, the whole caption and the
+    # "Sponsored" badge sit. The colour image is read as it is: on the S3 ad frames an Otsu threshold
+    # lost the label in about a third of frames, and the left half alone cut the captions short.
+    ocr_start = time.perf_counter()
+    h = image.shape[0] // 2
+    results = reader.readtext(image[h:h*2, :])
+    ocr_ms = round((time.perf_counter() - ocr_start) * 1000, 1)
+    return image, results, ocr_ms
 
-def capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, job_queue):
+def check_for_ad(hwnd, rect):
+    # Kept for callers that only need the yes/no answer
+    _, results, _ = read_screen(hwnd, rect)
+    flag, _, _ = match_label(results)
+    return flag is not None
+
+def capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, job_queue, impression_log):
     try:
         # create folder for the screenshots
         date_time = time.strftime("%Y%m%dat%H%M%S")
@@ -188,7 +220,7 @@ def capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, job_queue):
                 "demographic": monitoring_data["demographic"],
                 "location": monitoring_data["location"]
             })
-        scroll_down(hwnd, rect)
+        leave_video(hwnd, rect, impression_log)
     except Exception as e:
         print(e)
         print("An error occurred while capturing the ad. Exiting...")

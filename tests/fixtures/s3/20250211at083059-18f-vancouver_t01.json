@@ -1,0 +1,104 @@
+{
+ "source": "20250211at083059-18f-vancouver.mp4",
+ "frame_time_s": 1.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     15,
+     377
+    ],
+    [
+     91,
+     377
+    ],
+    [
+     91,
+     393
+    ],
+    [
+     15,
+     393
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9995
+  },
+  {
+   "bbox": [
+    [
+     11,
+     405
+    ],
+    [
+     141,
+     405
+    ],
+    [
+     141,
+     423
+    ],
+    [
+     11,
+     423
+    ]
+   ],
+   "text": "H&R Block Canada",
+   "conf": 0.8259
+  },
+  {
+   "bbox": [
+    [
+     147,
+     405
+    ],
+    [
+     199,
+     405
+    ],
+    [
+     199,
+     423
+    ],
+    [
+     147,
+     423
+    ]
+   ],
+   "text": "5d ago",
+   "conf": 0.5941
+  },
+  {
+   "bbox": [
+    [
+     10,
+     430
+    ],
+    [
+     292,
+     430
+    ],
+    [
+     292,
+     454
+    ],
+    [
+     10,
+     454
+    ]
+   ],
+   "text": "Be certain with tax expertise that gets yoU:.",
+   "conf": 0.6047
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

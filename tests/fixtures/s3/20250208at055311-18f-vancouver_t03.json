@@ -1,0 +1,104 @@
+{
+ "source": "20250208at055311-18f-vancouver.mp4",
+ "frame_time_s": 3.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     15,
+     377
+    ],
+    [
+     91,
+     377
+    ],
+    [
+     91,
+     393
+    ],
+    [
+     15,
+     393
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9995
+  },
+  {
+   "bbox": [
+    [
+     11,
+     407
+    ],
+    [
+     102,
+     407
+    ],
+    [
+     102,
+     423
+    ],
+    [
+     11,
+     423
+    ]
+   ],
+   "text": "hushblankets",
+   "conf": 0.9996
+  },
+  {
+   "bbox": [
+    [
+     111,
+     407
+    ],
+    [
+     145,
+     407
+    ],
+    [
+     145,
+     421
+    ],
+    [
+     111,
+     421
+    ]
+   ],
+   "text": "1-22",
+   "conf": 0.1204
+  },
+  {
+   "bbox": [
+    [
+     11,
+     432
+    ],
+    [
+     499,
+     432
+    ],
+    [
+     499,
+     453
+    ],
+    [
+     11,
+     453
+    ]
+   ],
+   "text": "All the dreamy duvet colours are back, shop now before they sell out again!",
+   "conf": 0.7344
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

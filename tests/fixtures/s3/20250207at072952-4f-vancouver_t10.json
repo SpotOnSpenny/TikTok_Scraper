@@ -1,0 +1,148 @@
+{
+ "source": "20250207at072952-4f-vancouver.mp4",
+ "frame_time_s": 10.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     109,
+     227
+    ],
+    [
+     415,
+     227
+    ],
+    [
+     415,
+     271
+    ],
+    [
+     109,
+     271
+    ]
+   ],
+   "text": "Exclusive colours",
+   "conf": 0.9347
+  },
+  {
+   "bbox": [
+    [
+     15,
+     375
+    ],
+    [
+     91,
+     375
+    ],
+    [
+     91,
+     391
+    ],
+    [
+     15,
+     391
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9993
+  },
+  {
+   "bbox": [
+    [
+     11,
+     405
+    ],
+    [
+     103,
+     405
+    ],
+    [
+     103,
+     421
+    ],
+    [
+     11,
+     421
+    ]
+   ],
+   "text": "dysoncanada",
+   "conf": 0.9433
+  },
+  {
+   "bbox": [
+    [
+     111,
+     403
+    ],
+    [
+     143,
+     403
+    ],
+    [
+     143,
+     419
+    ],
+    [
+     111,
+     419
+    ]
+   ],
+   "text": "1-16",
+   "conf": 0.6491
+  },
+  {
+   "bbox": [
+    [
+     11,
+     432
+    ],
+    [
+     465,
+     432
+    ],
+    [
+     465,
+     453
+    ],
+    [
+     11,
+     453
+    ]
+   ],
+   "text": "Best-in-class noise cancellation: Enhanced sound range and designe_",
+   "conf": 0.7813
+  },
+  {
+   "bbox": [
+    [
+     471,
+     435
+    ],
+    [
+     509,
+     435
+    ],
+    [
+     509,
+     449
+    ],
+    [
+     471,
+     449
+    ]
+   ],
+   "text": "more",
+   "conf": 0.9328
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

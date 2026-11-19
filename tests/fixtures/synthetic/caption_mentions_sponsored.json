@@ -1,0 +1,72 @@
+{
+ "source": "hand-written",
+ "frame_time_s": null,
+ "detections": [
+  {
+   "bbox": [
+    [
+     20,
+     300
+    ],
+    [
+     164,
+     300
+    ],
+    [
+     164,
+     330
+    ],
+    [
+     20,
+     330
+    ]
+   ],
+   "text": "techreviewer",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     340
+    ],
+    [
+     584,
+     340
+    ],
+    [
+     584,
+     370
+    ],
+    [
+     20,
+     370
+    ]
+   ],
+   "text": "This video is not sponsored, I bought it myself",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     420
+    ],
+    [
+     368,
+     420
+    ],
+    [
+     368,
+     450
+    ],
+    [
+     20,
+     450
+    ]
+   ],
+   "text": "original sound - techreviewer",
+   "conf": 0.9
+  }
+ ]
+}

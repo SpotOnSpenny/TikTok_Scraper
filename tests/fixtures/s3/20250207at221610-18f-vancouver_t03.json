@@ -1,0 +1,104 @@
+{
+ "source": "20250207at221610-18f-vancouver.mp4",
+ "frame_time_s": 3.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     15,
+     377
+    ],
+    [
+     91,
+     377
+    ],
+    [
+     91,
+     395
+    ],
+    [
+     15,
+     395
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9984
+  },
+  {
+   "bbox": [
+    [
+     11,
+     407
+    ],
+    [
+     85,
+     407
+    ],
+    [
+     85,
+     425
+    ],
+    [
+     11,
+     425
+    ]
+   ],
+   "text": "Invisaligno",
+   "conf": 0.7691
+  },
+  {
+   "bbox": [
+    [
+     94,
+     404
+    ],
+    [
+     173,
+     404
+    ],
+    [
+     173,
+     423
+    ],
+    [
+     94,
+     423
+    ]
+   ],
+   "text": "2024-12-12",
+   "conf": 0.6798
+  },
+  {
+   "bbox": [
+    [
+     11,
+     431
+    ],
+    [
+     261,
+     431
+    ],
+    [
+     261,
+     451
+    ],
+    [
+     11,
+     451
+    ]
+   ],
+   "text": "Take the Invisaligne Smile Quiz Todayl",
+   "conf": 0.865
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

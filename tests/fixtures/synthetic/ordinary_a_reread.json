@@ -1,0 +1,72 @@
+{
+ "source": "hand-written",
+ "frame_time_s": null,
+ "detections": [
+  {
+   "bbox": [
+    [
+     20,
+     300
+    ],
+    [
+     176,
+     300
+    ],
+    [
+     176,
+     330
+    ],
+    [
+     20,
+     330
+    ]
+   ],
+   "text": "gardenwithmia",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     340
+    ],
+    [
+     464,
+     340
+    ],
+    [
+     464,
+     370
+    ],
+    [
+     20,
+     370
+    ]
+   ],
+   "text": "Repotting my monstera after two year5",
+   "conf": 0.7
+  },
+  {
+   "bbox": [
+    [
+     20,
+     420
+    ],
+    [
+     380,
+     420
+    ],
+    [
+     380,
+     450
+    ],
+    [
+     20,
+     450
+    ]
+   ],
+   "text": "original sound - gardenwithmla",
+   "conf": 0.6
+  }
+ ]
+}

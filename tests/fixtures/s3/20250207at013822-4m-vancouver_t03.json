@@ -1,0 +1,104 @@
+{
+ "source": "20250207at013822-4m-vancouver.mp4",
+ "frame_time_s": 3.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     15,
+     377
+    ],
+    [
+     91,
+     377
+    ],
+    [
+     91,
+     393
+    ],
+    [
+     15,
+     393
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9996
+  },
+  {
+   "bbox": [
+    [
+     11,
+     407
+    ],
+    [
+     145,
+     407
+    ],
+    [
+     145,
+     425
+    ],
+    [
+     11,
+     425
+    ]
+   ],
+   "text": "shopfortunecharms",
+   "conf": 0.7469
+  },
+  {
+   "bbox": [
+    [
+     151,
+     403
+    ],
+    [
+     203,
+     403
+    ],
+    [
+     203,
+     423
+    ],
+    [
+     151,
+     423
+    ]
+   ],
+   "text": "Sd ago",
+   "conf": 0.6941
+  },
+  {
+   "bbox": [
+    [
+     9,
+     431
+    ],
+    [
+     363,
+     431
+    ],
+    [
+     363,
+     451
+    ],
+    [
+     9,
+     451
+    ]
+   ],
+   "text": "FREE WORLDWIDE SHIPPING! Get your necklace nowl",
+   "conf": 0.7057
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

@@ -3,3 +3,5 @@ M2K_TikTok_Scraper.egg-info/
 __pycache__
 .env
 Output/
+.venv/
+.pytest_cache/

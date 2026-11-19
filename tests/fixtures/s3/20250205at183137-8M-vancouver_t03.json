@@ -1,0 +1,148 @@
+{
+ "source": "20250205at183137-8M-vancouver.mp4",
+ "frame_time_s": 3.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     15,
+     351
+    ],
+    [
+     91,
+     351
+    ],
+    [
+     91,
+     369
+    ],
+    [
+     15,
+     369
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.8309
+  },
+  {
+   "bbox": [
+    [
+     11,
+     380
+    ],
+    [
+     98,
+     380
+    ],
+    [
+     98,
+     396
+    ],
+    [
+     11,
+     396
+    ]
+   ],
+   "text": "cravecanada",
+   "conf": 0.8453
+  },
+  {
+   "bbox": [
+    [
+     105,
+     377
+    ],
+    [
+     157,
+     377
+    ],
+    [
+     157,
+     397
+    ],
+    [
+     105,
+     397
+    ]
+   ],
+   "text": "5d ago",
+   "conf": 0.6544
+  },
+  {
+   "bbox": [
+    [
+     11,
+     409
+    ],
+    [
+     445,
+     409
+    ],
+    [
+     445,
+     429
+    ],
+    [
+     11,
+     429
+    ]
+   ],
+   "text": "The Ultimate Entertainment & Sports Bundle. Get hit movies, series",
+   "conf": 0.7644
+  },
+  {
+   "bbox": [
+    [
+     471,
+     411
+    ],
+    [
+     509,
+     411
+    ],
+    [
+     509,
+     425
+    ],
+    [
+     471,
+     425
+    ]
+   ],
+   "text": "more",
+   "conf": 0.9929
+  },
+  {
+   "bbox": [
+    [
+     15,
+     431
+    ],
+    [
+     141,
+     431
+    ],
+    [
+     141,
+     447
+    ],
+    [
+     15,
+     447
+    ]
+   ],
+   "text": "n Promoted Music",
+   "conf": 0.7987
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

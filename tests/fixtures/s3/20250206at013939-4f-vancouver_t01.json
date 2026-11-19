@@ -1,0 +1,148 @@
+{
+ "source": "20250206at013939-4f-vancouver.mp4",
+ "frame_time_s": 1.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     66,
+     37
+    ],
+    [
+     383,
+     37
+    ],
+    [
+     383,
+     128
+    ],
+    [
+     66,
+     128
+    ]
+   ],
+   "text": "SPORTS ON",
+   "conf": 0.6656
+  },
+  {
+   "bbox": [
+    [
+     64,
+     153
+    ],
+    [
+     458,
+     153
+    ],
+    [
+     458,
+     256
+    ],
+    [
+     64,
+     256
+    ]
+   ],
+   "text": "YOUR RADAR?",
+   "conf": 0.9998
+  },
+  {
+   "bbox": [
+    [
+     15,
+     377
+    ],
+    [
+     91,
+     377
+    ],
+    [
+     91,
+     395
+    ],
+    [
+     15,
+     395
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9993
+  },
+  {
+   "bbox": [
+    [
+     11,
+     407
+    ],
+    [
+     103,
+     407
+    ],
+    [
+     103,
+     425
+    ],
+    [
+     11,
+     425
+    ]
+   ],
+   "text": "NCSA_Sports",
+   "conf": 0.9988
+  },
+  {
+   "bbox": [
+    [
+     111,
+     405
+    ],
+    [
+     195,
+     405
+    ],
+    [
+     195,
+     421
+    ],
+    [
+     111,
+     421
+    ]
+   ],
+   "text": "2024-10-22",
+   "conf": 0.8111
+  },
+  {
+   "bbox": [
+    [
+     11,
+     431
+    ],
+    [
+     435,
+     431
+    ],
+    [
+     435,
+     451
+    ],
+    [
+     11,
+     451
+    ]
+   ],
+   "text": "Unlock your full athletic potential with NCSA's MVP + Membership_",
+   "conf": 0.9009
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

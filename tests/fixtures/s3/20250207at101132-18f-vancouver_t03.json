@@ -1,0 +1,104 @@
+{
+ "source": "20250207at101132-18f-vancouver.mp4",
+ "frame_time_s": 3.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     15,
+     377
+    ],
+    [
+     91,
+     377
+    ],
+    [
+     91,
+     395
+    ],
+    [
+     15,
+     395
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9996
+  },
+  {
+   "bbox": [
+    [
+     9,
+     405
+    ],
+    [
+     129,
+     405
+    ],
+    [
+     129,
+     425
+    ],
+    [
+     9,
+     425
+    ]
+   ],
+   "text": "adobephotoshop",
+   "conf": 1.0
+  },
+  {
+   "bbox": [
+    [
+     137,
+     405
+    ],
+    [
+     169,
+     405
+    ],
+    [
+     169,
+     421
+    ],
+    [
+     137,
+     421
+    ]
+   ],
+   "text": "1-23",
+   "conf": 0.9989
+  },
+  {
+   "bbox": [
+    [
+     11,
+     433
+    ],
+    [
+     149,
+     433
+    ],
+    [
+     149,
+     449
+    ],
+    [
+     11,
+     449
+    ]
+   ],
+   "text": "Remove Distractions",
+   "conf": 0.896
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

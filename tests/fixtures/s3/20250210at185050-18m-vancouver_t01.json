@@ -1,0 +1,104 @@
+{
+ "source": "20250210at185050-18m-vancouver.mp4",
+ "frame_time_s": 1.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     15,
+     377
+    ],
+    [
+     91,
+     377
+    ],
+    [
+     91,
+     395
+    ],
+    [
+     15,
+     395
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9991
+  },
+  {
+   "bbox": [
+    [
+     11,
+     407
+    ],
+    [
+     65,
+     407
+    ],
+    [
+     65,
+     423
+    ],
+    [
+     11,
+     423
+    ]
+   ],
+   "text": "Coursiv",
+   "conf": 0.9841
+  },
+  {
+   "bbox": [
+    [
+     73,
+     405
+    ],
+    [
+     123,
+     405
+    ],
+    [
+     123,
+     423
+    ],
+    [
+     73,
+     423
+    ]
+   ],
+   "text": "4h ago",
+   "conf": 0.9048
+  },
+  {
+   "bbox": [
+    [
+     11,
+     433
+    ],
+    [
+     259,
+     433
+    ],
+    [
+     259,
+     451
+    ],
+    [
+     11,
+     451
+    ]
+   ],
+   "text": "Kickstart your Al journey with Coursivl",
+   "conf": 0.3802
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

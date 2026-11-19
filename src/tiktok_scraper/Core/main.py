@@ -15,6 +15,7 @@ from tiktok_scraper.Core.selenium_utils import start_webdriver, search_for_ad
 from tiktok_scraper.Core.processing import process_ad, finish_processing
 from tiktok_scraper.Core.logger import start_logging
 from tiktok_scraper.Core.bluestacks import process_bluestacks_ad, find_bluestacks_ad, find_bluestacks_window, capture_bluestacks_ad
+from tiktok_scraper.Core.impression import ImpressionLog
 
 #######################################################################################
 #                                        Notes:                                       #
@@ -94,6 +95,15 @@ def scrape_tiktok(interface="web"):
     error_event = threading.Event()
     keystroke_event = threading.Event()
 
+    # Start the per-impression log: one row and one stored frame per video, in a folder for this session
+    impression_log = None
+    if interface == "mobile":
+        session_id = f"{datetime.datetime.now():%Y%m%dat%H%M%S}_{demographic}_{vpn}"
+        session_dir = os.path.join(output_dir, session_id)
+        os.mkdir(session_dir)
+        impression_log = ImpressionLog(session_dir, session_id, {"demographic": demographic, "location": vpn})
+        print("Per-impression log: " + impression_log.path)
+
     # Define and start the logging and scraping threads
     try:
         logging_thread = threading.Thread(target=start_logging, args = (f"{demographic}_{vpn}", stop_event, error_event, keystroke_event, data_lock))
@@ -124,8 +134,8 @@ def scrape_tiktok(interface="web"):
                 search_for_ad(driver)
                 process_ad(driver, output_dir, data_lock, processing_queue)
             elif interface == "mobile":
-                rect = find_bluestacks_ad(hwnd)
-                capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, processing_queue)
+                rect = find_bluestacks_ad(hwnd, impression_log)
+                capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, processing_queue, impression_log)
     except KeyboardInterrupt:
         print("Keyboard interrupt detected. Exiting...")
         keystroke_event.set()
@@ -139,6 +149,10 @@ def scrape_tiktok(interface="web"):
         logging_thread.join()
         processing_thread.join()
         quit(1)
+    finally:
+        # Write the row for the video still on screen, however the session ended
+        if impression_log is not None:
+            impression_log.close("session_end")
 
     # Stop the logging thread and close the webdriver
     stop_event.set()

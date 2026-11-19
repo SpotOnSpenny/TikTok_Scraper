@@ -1,0 +1,126 @@
+{
+ "source": "20250207at235225-4f-vancouver.mp4",
+ "frame_time_s": 3.0,
+ "frame_size": [
+  524,
+  932
+ ],
+ "crop": "lower half, full width",
+ "crop_size": [
+  524,
+  466
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     472,
+     18
+    ],
+    [
+     516,
+     18
+    ],
+    [
+     516,
+     44
+    ],
+    [
+     472,
+     44
+    ]
+   ],
+   "text": "SLUE",
+   "conf": 0.251
+  },
+  {
+   "bbox": [
+    [
+     14,
+     372
+    ],
+    [
+     91,
+     372
+    ],
+    [
+     91,
+     391
+    ],
+    [
+     14,
+     391
+    ]
+   ],
+   "text": "Sponsored",
+   "conf": 0.9994
+  },
+  {
+   "bbox": [
+    [
+     11,
+     403
+    ],
+    [
+     99,
+     403
+    ],
+    [
+     99,
+     419
+    ],
+    [
+     11,
+     419
+    ]
+   ],
+   "text": "cravecanada",
+   "conf": 0.9578
+  },
+  {
+   "bbox": [
+    [
+     107,
+     403
+    ],
+    [
+     137,
+     403
+    ],
+    [
+     137,
+     419
+    ],
+    [
+     107,
+     419
+    ]
+   ],
+   "text": "1-16",
+   "conf": 0.9938
+  },
+  {
+   "bbox": [
+    [
+     8,
+     430
+    ],
+    [
+     510,
+     430
+    ],
+    [
+     510,
+     455
+    ],
+    [
+     8,
+     455
+    ]
+   ],
+   "text": "It's the off-season, baby! A new season of Shoresy is nOw streaming - more",
+   "conf": 0.5478
+  }
+ ],
+ "ocr_input": "colour crop, no threshold"
+}

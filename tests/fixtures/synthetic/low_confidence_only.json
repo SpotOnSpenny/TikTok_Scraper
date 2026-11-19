@@ -1,0 +1,28 @@
+{
+ "source": "hand-written",
+ "frame_time_s": null,
+ "detections": [
+  {
+   "bbox": [
+    [
+     20,
+     300
+    ],
+    [
+     56,
+     300
+    ],
+    [
+     56,
+     330
+    ],
+    [
+     20,
+     330
+    ]
+   ],
+   "text": "~|l",
+   "conf": 0.05
+  }
+ ]
+}
