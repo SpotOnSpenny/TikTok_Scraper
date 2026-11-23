@@ -1,6 +1,10 @@
 # Python Standard Library Dependencies
 import datetime
+import json
 import os
+import re
+import subprocess
+import urllib.request
 import threading
 import queue
 
@@ -14,14 +18,43 @@ from tiktok_scraper.Core.global_vars import monitoring_data
 from tiktok_scraper.Core.selenium_utils import start_webdriver, search_for_ad
 from tiktok_scraper.Core.processing import process_ad, finish_processing
 from tiktok_scraper.Core.logger import start_logging
-from tiktok_scraper.Core.bluestacks import process_bluestacks_ad, find_bluestacks_ad, find_bluestacks_window, capture_bluestacks_ad
+from tiktok_scraper.Core.collector import find_ad, capture_ad, process_ads
 from tiktok_scraper.Core.impression import ImpressionLog
+from tiktok_scraper.Core.phone import choose_phone
 
 #######################################################################################
 #                                        Notes:                                       #
 #######################################################################################
 
+def clean_location(text):
+    # "Red Deer" -> "red-deer": lower case, hyphens for anything that is not a letter or number,
+    # since the location goes into folder and file names where underscores separate the parts
+    return re.sub(r"[^a-z0-9]+", "-", text.strip().lower()).strip("-")
+
+def public_network():
+    # Where the internet sees this connection: {"ip", "city", "region", "country", "org", ...} or None
+    try:
+        with urllib.request.urlopen("https://ipinfo.io/json", timeout=10) as response:
+            details = json.loads(response.read().decode())
+        return {key: details.get(key) for key in ["ip", "city", "region", "country", "org", "timezone"]}
+    except Exception:
+        return None
+
+def current_commit(repo_dir):
+    # The commit of the scraper that is running, for the session record
+    try:
+        result = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo_dir, capture_output=True, timeout=10)
+        return result.stdout.decode().strip() or None
+    except Exception:
+        return None
+
 def scrape_tiktok(interface="web"):
+    # interface is "web" (browser), "mobile" (BlueStacks window) or "phone" (Android phone over adb)
+    if interface not in ["web", "mobile", "phone"]:
+        print("Interface must be web, mobile or phone.")
+        quit(1)
+    app_interface = interface in ["mobile", "phone"]
+
     # TODO - add support for custom output directory via environment variable
     # TODO - make console portion of CLI prettier and more user friendly
     # TODO - add better error handling for critical errors to log properly
@@ -33,7 +66,11 @@ def scrape_tiktok(interface="web"):
     # Check for output dirs and create them if non_existent
     src_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     output_dir = os.path.join(src_dir, "Output")
-    if not os.path.exists(output_dir):
+    if app_interface:
+        # Each app session keeps everything in its own folder inside Output, so earlier sessions can stay
+        # where they are and several phones can run at once
+        os.makedirs(output_dir, exist_ok=True)
+    elif not os.path.exists(output_dir):
         os.mkdir(output_dir)
     else:
         print("Output directory already exists! Please clear the directory before running the scraper.")
@@ -41,9 +78,10 @@ def scrape_tiktok(interface="web"):
 
     # Initialize the queue and spreadsheet for processing ads, and s3 client for uploading videos
     processing_queue = queue.Queue()
-    data_key = pandas.DataFrame(columns=["Ad ID", "Found at Index", "Demographic", "Location", "Ad Length", "CTA Link", "Caption", "Posting Account"])
-    data_key.to_csv(os.path.join(output_dir, "Data Key.csv"), index=False)
-    s3_client = boto3.client("s3")
+    if interface == "web":
+        data_key = pandas.DataFrame(columns=["Ad ID", "Found at Index", "Demographic", "Location", "Ad Length", "CTA Link", "Caption", "Posting Account"])
+        data_key.to_csv(os.path.join(output_dir, "Data Key.csv"), index=False)
+        s3_client = boto3.client("s3")
 
     # Initialize the scraper with user input
     valid_time = False
@@ -63,21 +101,38 @@ def scrape_tiktok(interface="web"):
         except Exception as e:
             print(e)
             quit(1)
+    # Collection runs on the local connection: through a VPN TikTok serves no ads. The location is where
+    # the collector physically is, and the public IP address is looked up so the record does not rest on typing.
+    network = public_network()
+    if network:
+        print(f"This connection's public address is in {network.get('city')}, {network.get('region')}, {network.get('country')} ({network.get('org')}).")
+        print("If that is a VPN or not where you are, stop and switch the VPN off: TikTok serves no ads through one.")
+    else:
+        print("Could not look up this connection's public address; the session will record the typed location only.")
     vpn_inted = False
     while vpn_inted is False:
-        vpn = input("Please ensure proper connection to the VPN, enter the location, and hit enter to continue.")
-        if vpn.lower() in ["halifax", "calgary", "toronto", "vancouver"]:
+        vpn = clean_location(input("Please enter the city this collection is running from, and hit enter to continue."))
+        if vpn != "":
             vpn_inted = True
         else:
-            print("Location is not a valid Canadian city to be scraped, please enter a valid location.")
+            print("Please enter a location, using letters and numbers.")
     if interface == "web":
         driver.get("https://www.tiktok.com/")
     elif interface == "mobile":
+        # Imported here because it needs Windows and the BlueStacks window
+        from tiktok_scraper.Core.bluestacks import find_bluestacks_window, BlueStacksDevice
         print("Please open your emulator of choice and open the TikTok app.")
         hwnd = None
         while hwnd is None:
             window_name = input("Please enter the name of the window that contains the TikTok app: ")
             hwnd = find_bluestacks_window(window_name)
+        device = BlueStacksDevice(hwnd)
+    elif interface == "phone":
+        print("Please plug in the phone with USB debugging switched on, unlock it and open the TikTok app.")
+        device = None
+        while device is None:
+            input("Hit enter when the phone is ready.")
+            device = choose_phone()
     demographic_logged_in = False
     while demographic_logged_in is False:
         demographic = input("Please log in with a TikTok account, enter the demographic of the account, and hit enter to continue.")
@@ -95,14 +150,31 @@ def scrape_tiktok(interface="web"):
     error_event = threading.Event()
     keystroke_event = threading.Event()
 
-    # Start the per-impression log: one row and one stored frame per video, in a folder for this session
+    # Start the session folder and the per-impression log: one row and one stored frame per video
     impression_log = None
-    if interface == "mobile":
+    if app_interface:
+        device.prepare()
+        device_details = device.describe()
         session_id = f"{datetime.datetime.now():%Y%m%dat%H%M%S}_{demographic}_{vpn}"
+        if device_details.get("serial"):
+            session_id += "_" + device_details["serial"][-4:]
         session_dir = os.path.join(output_dir, session_id)
         os.mkdir(session_dir)
+        pandas.DataFrame(columns=["Ad ID", "Demographic", "Location", "FPS", "Found At Index"]).to_csv(os.path.join(session_dir, "Data Key.csv"), index=False)
+        with open(os.path.join(session_dir, "session.json"), "w", encoding="utf-8") as file:
+            json.dump({
+                "session_id": session_id,
+                "started_at": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+                "planned_hours": input_time,
+                "interface": interface,
+                "demographic": demographic,
+                "location": vpn,
+                "network": network,
+                "collector_commit": current_commit(src_dir),
+                "device": device_details
+            }, file, indent=1)
         impression_log = ImpressionLog(session_dir, session_id, {"demographic": demographic, "location": vpn})
-        print("Per-impression log: " + impression_log.path)
+        print("Session folder: " + session_dir)
 
     # Define and start the logging and scraping threads
     try:
@@ -117,8 +189,8 @@ def scrape_tiktok(interface="web"):
     try:
         if interface == "web":
             processing_thread = threading.Thread(target=finish_processing, args = (stop_event, error_event, processing_queue, output_dir, s3_client))
-        elif interface == "mobile":
-            processing_thread = threading.Thread(target=process_bluestacks_ad, args = (stop_event, error_event, keystroke_event, processing_queue, output_dir, s3_client))
+        else:
+            processing_thread = threading.Thread(target=process_ads, args = (stop_event, error_event, keystroke_event, processing_queue, session_dir))
         processing_thread.start()
     except Exception as e:
         print(e)
@@ -133,9 +205,9 @@ def scrape_tiktok(interface="web"):
             if interface == "web":
                 search_for_ad(driver)
                 process_ad(driver, output_dir, data_lock, processing_queue)
-            elif interface == "mobile":
-                rect = find_bluestacks_ad(hwnd, impression_log)
-                capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, processing_queue, impression_log)
+            else:
+                find_ad(device, impression_log)
+                capture_ad(device, session_dir, data_lock, processing_queue, impression_log)
     except KeyboardInterrupt:
         print("Keyboard interrupt detected. Exiting...")
         keystroke_event.set()
@@ -153,6 +225,11 @@ def scrape_tiktok(interface="web"):
         # Write the row for the video still on screen, however the session ended
         if impression_log is not None:
             impression_log.close("session_end")
+        if app_interface:
+            try:
+                device.close()
+            except Exception as e:
+                print(e)
 
     # Stop the logging thread and close the webdriver
     stop_event.set()
@@ -166,5 +243,5 @@ def scrape_tiktok(interface="web"):
 
 # Test code below
 if __name__ == '__main__':
-    interface = input("Please enter the interface you would like to use (web/mobile): ")
+    interface = input("Please enter the interface you would like to use (web/mobile/phone): ")
     scrape_tiktok(interface)

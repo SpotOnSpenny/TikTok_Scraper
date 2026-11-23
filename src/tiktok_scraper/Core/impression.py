@@ -149,11 +149,19 @@ class ImpressionLog:
         # Where the stored frame for the next impression should be saved
         return os.path.join(self.frames_dir, f"{self.index + 1:06d}.jpg")
 
-    def open(self, shown_at, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=True):
+    def last_swipe_time(self):
+        # When the swipe that should bring the next video on screen was sent, or None
+        if self.current is None or not self.current["swipes"]:
+            return None
+        return self.current["swipes"][-1]["at"]
+
+    def open(self, shown_at, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=True, first_read_at=None):
+        # shown_at is when the video came on screen; first_read_at is when it was first read
         self.index += 1
         self.current = {
             "index": self.index,
             "shown_at": shown_at,
+            "first_read_at": first_read_at if first_read_at is not None else shown_at,
             "text": text,
             "flag": flag,
             "score": score,
@@ -214,6 +222,7 @@ class ImpressionLog:
             "session_id": self.session_id,
             "index": current["index"],
             "shown_at": iso_time(current["shown_at"]),
+            "first_read_at": iso_time(current["first_read_at"]),
             "left_at": iso_time(left_at),
             "dwell_s": round(left_at - current["shown_at"], 3),
             "account": current["text"]["account"],

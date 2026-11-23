@@ -1,0 +1,165 @@
+# Python Standard Library Dependencies
+import os
+import re
+import subprocess
+
+# External Dependency Imports
+import cv2
+import numpy
+
+#######################################################################################
+#                                        Notes:                                       #
+#######################################################################################
+# A real Android phone, driven over USB with adb (Android platform-tools). The phone needs
+# USB debugging switched on and this computer authorised on it. Nothing here uses the
+# computer's mouse, keyboard or screen, so several phones can run at once, each from its
+# own copy of the scraper.
+#
+# adb is found on the PATH, or at the location given in the ADB_PATH environment variable.
+
+TIKTOK_PACKAGES = ["com.zhiliaoapp.musically", "com.ss.android.ugc.trill"]
+RECORDING_ON_PHONE = "/sdcard/tiktok_scraper_ad.mp4"
+SWIPE_MILLISECONDS = 300
+
+
+def adb_path():
+    return os.environ.get("ADB_PATH") or "adb"
+
+
+def run_adb(arguments, timeout=30):
+    # Runs adb and returns what it printed, as bytes. Raises if adb reports a failure.
+    try:
+        result = subprocess.run([adb_path()] + list(arguments), capture_output=True, timeout=timeout)
+    except FileNotFoundError:
+        raise RuntimeError("adb was not found. Install Android platform-tools and add it to the PATH, or set ADB_PATH.")
+    if result.returncode != 0:
+        raise RuntimeError(f"adb {' '.join(arguments)} failed: {result.stderr.decode(errors='replace').strip()}")
+    return result.stdout
+
+
+def list_phones():
+    # Returns [(serial, state)] for every phone adb can see. state is "device" when ready,
+    # "unauthorized" when the phone has not yet allowed this computer.
+    lines = run_adb(["devices"]).decode(errors="replace").splitlines()
+    phones = []
+    for line in lines[1:]:
+        parts = line.split()
+        if len(parts) >= 2:
+            phones.append((parts[0], parts[1]))
+    return phones
+
+
+def choose_phone():
+    # Asks which phone to use when more than one is connected. Returns a PhoneDevice, or None.
+    phones = list_phones()
+    if len(phones) == 0:
+        print("No phone found. Plug it in with USB debugging switched on and try again.")
+        return None
+    for index, (serial, state) in enumerate(phones):
+        print(f"{index} - Phone found: {serial} ({state})")
+    index = 0
+    if len(phones) > 1:
+        answer = input("Which phone should be used? (Enter its index): \n")
+        if not answer.isdigit() or int(answer) > len(phones) - 1:
+            print("Phone not found. Please try again.")
+            return None
+        index = int(answer)
+    serial, state = phones[index]
+    if state != "device":
+        print(f"Phone {serial} is '{state}'. Unlock it and accept the 'Allow USB debugging' prompt, then try again.")
+        return None
+    return PhoneDevice(serial)
+
+
+class PhoneDevice:
+
+    def __init__(self, serial):
+        self.serial = serial
+        self.size = None
+
+    def adb(self, *arguments, timeout=30):
+        return run_adb(["-s", self.serial] + list(arguments), timeout=timeout)
+
+    def shell(self, command, timeout=30):
+        return self.adb("shell", command, timeout=timeout).decode(errors="replace").strip()
+
+    def prepare(self):
+        # Wake the screen and keep it on while the phone is plugged in
+        self.shell("input keyevent KEYCODE_WAKEUP")
+        self.shell("svc power stayon true")
+
+    def close(self):
+        # Let the screen time out normally again
+        self.shell("svc power stayon false")
+
+    def read_frame(self):
+        png = self.adb("exec-out", "screencap", "-p")
+        image = cv2.imdecode(numpy.frombuffer(png, dtype=numpy.uint8), cv2.IMREAD_COLOR)
+        if image is None:
+            raise RuntimeError(f"Could not read a screenshot from phone {self.serial}")
+        self.size = (image.shape[1], image.shape[0])
+        return image
+
+    def swipe_up(self):
+        # Drag from three quarters of the way down the screen to one quarter, in the middle
+        if self.size is None:
+            self.read_frame()
+        width, height = self.size
+        x = width // 2
+        y_start = (height * 3) // 4
+        y_end = height // 4
+        self.shell(f"input swipe {x} {y_start} {x} {y_end} {SWIPE_MILLISECONDS}")
+        return {"x": x, "y_start": y_start, "y_end": y_end, "duration_ms": SWIPE_MILLISECONDS}
+
+    def trim(self):
+        # Memory trimming is an emulator feature; a phone looks after itself
+        pass
+
+    def refresh(self):
+        print("Refreshing feed")
+        self.shell("input keyevent KEYCODE_BACK")
+
+    def record_ad(self, folder, seconds):
+        # Record the phone's screen on the phone, then copy the video over. No sound is recorded.
+        video_path = os.path.join(folder, "ad.mp4")
+        self.shell(f"screenrecord --time-limit {int(seconds)} --bit-rate 4000000 {RECORDING_ON_PHONE}", timeout=seconds + 30)
+        self.adb("pull", RECORDING_ON_PHONE, video_path, timeout=120)
+        self.shell(f"rm {RECORDING_ON_PHONE}")
+        return {"video_path": video_path}
+
+    def describe(self):
+        # What the session record should say about this phone. Anything that cannot be read is None.
+        details = {"device_kind": "phone", "serial": self.serial}
+        for key, command in [
+            ("model", "getprop ro.product.model"),
+            ("manufacturer", "getprop ro.product.manufacturer"),
+            ("android_version", "getprop ro.build.version.release"),
+            ("screen_size", "wm size")
+        ]:
+            try:
+                details[key] = self.shell(command) or None
+            except RuntimeError:
+                details[key] = None
+        details["tiktok_package"] = None
+        details["tiktok_version"] = None
+        for package in TIKTOK_PACKAGES:
+            try:
+                match = re.search(r"versionName=(\S+)", self.shell(f"dumpsys package {package}"))
+            except RuntimeError:
+                match = None
+            if match:
+                details["tiktok_package"] = package
+                details["tiktok_version"] = match.group(1)
+                break
+        return details
+
+
+# Test code below
+if __name__ == '__main__':
+    # Quick check of a connected phone: prints its details, saves one screenshot and swipes once
+    phone = choose_phone()
+    if phone is not None:
+        phone.prepare()
+        print(phone.describe())
+        cv2.imwrite("phone_check.jpg", phone.read_frame())
+        print("Saved phone_check.jpg, now swiping once:", phone.swipe_up())

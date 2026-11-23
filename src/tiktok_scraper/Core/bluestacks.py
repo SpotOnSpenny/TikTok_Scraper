@@ -1,11 +1,6 @@
 # Python Standard Library Dependencies
 import time
 import os
-from PIL import Image
-import pandas
-import shutil
-import traceback
-import queue
 import ctypes
 import contextlib
 
@@ -15,22 +10,15 @@ import win32con
 import win32api
 import win32ui
 import cv2
-import easyocr
-import boto3
-
-# Internal Dependency Imports
-from tiktok_scraper.Core.global_vars import monitoring_data
-from tiktok_scraper.Core.processing import stitch_video
-from tiktok_scraper.Core.impression import match_label, screen_text, same_video, read_region
 
 #######################################################################################
 #                                        Notes:                                       #
 #######################################################################################
+# The TikTok app in a BlueStacks window on this computer. BlueStacksDevice is the "device"
+# the collection loop in collector.py drives; the swipe uses the real mouse cursor, so only
+# one emulator can run per desktop and the mouse must be left alone.
 
 ctypes.windll.user32.SetProcessDPIAware()
-reader = easyocr.Reader(['en'], gpu=False, verbose=False)
-# After this many swipes in a row that do not change the video, press back and refresh the feed
-STUCK_SWIPE_LIMIT = 5
 
 @contextlib.contextmanager
 def gdi_context(dcObj, cDC, wDC, dataBitMap, hwnd):
@@ -66,7 +54,7 @@ def find_bluestacks_window(window_name):
     return hwndChild
 
 def scroll_down(hwnd, rect):
-    # Sends the swipe and returns its parameters. Counting happens in find_bluestacks_ad,
+    # Sends the swipe and returns its parameters. Counting happens in collector.find_ad,
     # once the next read confirms the video changed.
     x = (rect[2] - rect[0]) // 2
     y = (rect[3] - rect[1]) // 4
@@ -75,91 +63,6 @@ def scroll_down(hwnd, rect):
     win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, 0, -(y*2), 0, 0)
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
     return {"x": x, "y_start": y*3, "y_end": y}
-
-def leave_video(hwnd, rect, impression_log):
-    global monitoring_data
-    # Swipe away from the video on screen and record the swipe against its impression
-    swipe = scroll_down(hwnd, rect)
-    impression_log.note_swipe(time.time(), swipe)
-    swipes = impression_log.swipe_count()
-
-    if swipes == 1:
-        # First swipe away from a counted video: the routine housekeeping, once per video
-        # Trim the memory if it's been 25 videos
-        # We trim twice since the first time sometimes just registers the hotkey, the second removes the memory
-        if monitoring_data["videos_watched"] % 25 == 0:
-            trim_mem()
-            time.sleep(1)
-            trim_mem()
-            time.sleep(1)
-
-        # Every 150 videos send CTRL + SHIFT + 2 and wait 10 seconds to hit the back button and refresh the feed
-        if monitoring_data["videos_watched"] % 150 == 0:
-            time.sleep(2)
-            refresh_feed()
-            time.sleep(10)
-    elif swipes % STUCK_SWIPE_LIMIT == 0:
-        # The feed is stuck (pop-up, frozen video): the swipes are not changing what is on screen
-        print(f"Feed has not moved after {swipes} swipes, refreshing")
-        time.sleep(2)
-        refresh_feed()
-        impression_log.note_refresh()
-        time.sleep(10)
-
-def find_bluestacks_ad(hwnd, impression_log):
-    global monitoring_data
-    rect = win32gui.GetWindowRect(hwnd)
-    ad_found = False
-    while ad_found is False:
-        time.sleep(1)
-        # Start timer for process
-        start_time = time.time()
-
-        # Read the screen once; the same OCR results feed the label check, the swipe check and the log
-        image, results, region_height, ocr_ms = read_screen(hwnd, rect)
-        scoring_start = time.perf_counter()
-        flag, score, matched_text = match_label(results)
-        text = screen_text(results, height=region_height)
-        previous_text = impression_log.current_text()
-        same = same_video(previous_text, text) if previous_text is not None else False
-        scoring_ms = round((time.perf_counter() - scoring_start) * 1000, 1)
-
-        if same is True:
-            impression_log.note_read()
-            if flag is not None and not impression_log.is_ad():
-                # Same video as before, but the label is on screen now: it rendered late, or this was
-                # wrongly judged the same. Either way an ad is showing that has not been captured.
-                print("Ad found on a later read at index: " + str(monitoring_data["data_index"]))
-                impression_log.mark_ad(flag, score, matched_text)
-                ad_found = True
-            else:
-                # The text on screen has not changed, so the last swipe did not advance. Swipe again without counting.
-                print("Swipe not confirmed at index: " + str(monitoring_data["data_index"]) + ", swiping again")
-                leave_video(hwnd, rect, impression_log)
-        else:
-            # A new video: write the row for the one just left, count this one and store its frame.
-            # A read with no text is still counted, but flagged, since nothing shows that the video changed.
-            if impression_log.has_open():
-                impression_log.close("advanced")
-                monitoring_data["data_index"] += 1
-            monitoring_data["videos_watched"] += 1
-            frame_path = impression_log.next_frame_path()
-            cv2.imwrite(frame_path, image, [cv2.IMWRITE_JPEG_QUALITY, 80])
-            impression_log.open(start_time, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=len(text["lines"]) > 0)
-            if flag is not None:
-                print("Ad found at index: " + str(monitoring_data["data_index"]))
-                ad_found = True
-            else:
-                print("No ad found at index: " + str(monitoring_data["data_index"]))
-                leave_video(hwnd, rect, impression_log)
-        # End timer for process to nearest second
-        end_time = time.time()
-        time_elapsed = (end_time - start_time).__round__(2)
-        print(f"Time elapsed determining if ad or not: {time_elapsed}")
-        if time_elapsed < 5:
-            wait = 5 - time_elapsed
-            time.sleep(wait)
-    return rect
 
 def take_screencaps(hwnd, rect, file_name):
     w = rect[2] - rect[0]
@@ -177,90 +80,59 @@ def take_screencaps(hwnd, rect, file_name):
 
     return 
 
-def read_screen(hwnd, rect):
-    # Returns (full-window image, EasyOCR results for the read region, height of that region, OCR time in ms)
-    check_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ad_check_screencap")
-    screencap_path = os.path.join(check_folder, "screencap.png")
-    take_screencaps(hwnd, rect, screencap_path)
-    image = cv2.imread(screencap_path)
+class BlueStacksDevice:
 
-    # Read the lower half of the window, where the account, the whole caption and the "Sponsored" badge
-    # sit, without the right-hand count rail. The colour image is read as it is: on the S3 ad frames an
-    # Otsu threshold lost the label in about a third of frames, and the left half alone cut the captions short.
-    ocr_start = time.perf_counter()
-    region = read_region(image)
-    results = reader.readtext(region)
-    ocr_ms = round((time.perf_counter() - ocr_start) * 1000, 1)
-    return image, results, region.shape[0], ocr_ms
+    def __init__(self, hwnd):
+        self.hwnd = hwnd
+        self.rect = win32gui.GetWindowRect(hwnd)
 
-def capture_bluestacks_ad(hwnd, output_dir, rect, data_lock, job_queue, impression_log):
-    try:
-        # create folder for the screenshots
-        date_time = time.strftime("%Y%m%dat%H%M%S")
-        folder_name = f"{date_time}_{str(monitoring_data['ads_found'])}_{monitoring_data['demographic']}_{monitoring_data['location']}"
-        ad_folder = os.path.join(output_dir, folder_name)
-        os.mkdir(ad_folder)
+    def prepare(self):
+        pass
 
-        start_time = time.time()
-        end_time = start_time + 20
+    def close(self):
+        pass
+
+    def read_frame(self):
+        self.rect = win32gui.GetWindowRect(self.hwnd)
+        check_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ad_check_screencap")
+        screencap_path = os.path.join(check_folder, "screencap.png")
+        take_screencaps(self.hwnd, self.rect, screencap_path)
+        return cv2.imread(screencap_path)
+
+    def swipe_up(self):
+        return scroll_down(self.hwnd, self.rect)
+
+    def trim(self):
+        # We trim twice since the first time sometimes just registers the hotkey, the second removes the memory
+        trim_mem()
+        time.sleep(1)
+        trim_mem()
+        time.sleep(1)
+
+    def refresh(self):
+        # CTRL + SHIFT + 2 is the BlueStacks back button
+        refresh_feed()
+
+    def record_ad(self, folder, seconds):
+        # Screenshots as fast as they come, at most 20 a second, numbered from 1; stitched into a video later
+        end_time = time.time() + seconds
         screenshot_count = 0
         while time.time() < end_time:
             screenshot_count += 1
             screenshot_timer = time.time()
-            take_screencaps(hwnd, rect, f"{ad_folder}/{screenshot_count}.png")
+            take_screencaps(self.hwnd, self.rect, f"{folder}/{screenshot_count}.png")
             screenshot_time = time.time() - screenshot_timer
             if screenshot_time < 0.05:
                 wait_time = 0.05 - screenshot_time
                 time.sleep(wait_time)
-        
-        # Submit the job to the processing queue
-        with data_lock:
-            monitoring_data["ads_this_log"] += 1
-            monitoring_data["ads_found"] += 1
-            job_queue.put({
-                "folder_name": folder_name,
-                "found_at_time": date_time,
-                "fps": screenshot_count / 20,
-                "found_at_index": monitoring_data["data_index"],
-                "demographic": monitoring_data["demographic"],
-                "location": monitoring_data["location"]
-            })
-        leave_video(hwnd, rect, impression_log)
-    except Exception as e:
-        print(e)
-        print("An error occurred while capturing the ad. Exiting...")
-        traceback.print_exc()
-        quit(1)
+        return {"fps": screenshot_count / seconds}
 
-# TODO we need to process this later for things like the Caption text and the length
-def process_bluestacks_ad(stop_event, error_event, keystroke_event, job_queue, output_dir, s3_client):
-    while not stop_event.is_set() and not error_event.is_set() and not keystroke_event.is_set():
-        try:
-            ad_info = job_queue.get(block=True, timeout=30)
-            ad_id = f"{ad_info['found_at_time']}_{ad_info['demographic']}_{ad_info['location']}"
-            video_path = stitch_video(os.path.join(output_dir, ad_info["folder_name"]), ad_info["fps"], ad_id)
-            # Upload the video to S3
-            s3_client = boto3.client('s3')
-            s3_client.upload_file(video_path, os.environ.get("S3_Bucket"), f"{ad_id}.mp4")
-            pandas.DataFrame({
-                "Ad ID": [ad_id],
-                "Demographic": [ad_info["demographic"]],
-                "Location": [ad_info["location"]],
-                "FPS": [ad_info["fps"]],
-                "Found At Index": [ad_info["found_at_index"]]
-            }).to_csv(os.path.join(output_dir, "Data Key.csv"), mode='a', header=False, index=False)
-            print(f"Ad {ad_id} processed and uploaded to S3. Removing it from the disk.")
-            shutil.rmtree(os.path.join(output_dir, ad_info["folder_name"]))
-
-        except queue.Empty:
-            continue
-            
-        except Exception as e:
-            print(e)
-            print("An error occurred while processing the ad. Exiting...")
-            traceback.print_exc()
-            error_event.set()
-            break
+    def describe(self):
+        return {
+            "device_kind": "bluestacks",
+            "window_title": win32gui.GetWindowText(win32gui.GetParent(self.hwnd) or self.hwnd),
+            "window_size": [self.rect[2] - self.rect[0], self.rect[3] - self.rect[1]]
+        }
 
 def trim_mem():
     print("Trimming memory")
