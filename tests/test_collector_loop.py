@@ -478,3 +478,47 @@ def test_a_blank_screen_with_no_backup_text_is_still_counted_and_flagged(device,
 
     assert rows(log)[0]["advance_confirmed"] is False
     assert rows(log)[0]["text_source"] == "test"
+
+
+# ----------------------------------- choosing the engine -----------------------------------
+
+def test_engine_check_reports_how_a_separate_process_ended():
+    # A loader that does not exist stands in for one that fails: the check must say so, not raise
+    outcome = collector.crashes_in_a_separate_process("no_such_loader")
+    assert outcome.startswith("stopped with exit code 1")
+    assert "no_such_loader" in outcome
+
+
+def test_easyocr_is_used_when_the_fast_engine_crashes(monkeypatch, capsys):
+    import sys
+    monkeypatch.delenv("OCR_ENGINE", raising=False)
+    monkeypatch.setattr(collector.importlib.util, "find_spec", lambda name: object())
+    monkeypatch.setattr(collector, "crashes_in_a_separate_process", lambda name: "stopped with exit code -1073741819 (no error message)")
+    fake_easyocr = mock.MagicMock()
+    fake_easyocr.Reader.return_value.readtext = "easyocr reader"
+    monkeypatch.setitem(sys.modules, "easyocr", fake_easyocr)
+
+    assert collector.load_engine() == ("easyocr", "easyocr reader")
+    printed = capsys.readouterr().out
+    assert "RapidOCR could not start" in printed and "-1073741819" in printed
+
+
+def test_asking_for_the_fast_engine_by_name_fails_loudly_when_it_cannot_run(monkeypatch):
+    monkeypatch.setenv("OCR_ENGINE", "rapidocr")
+    monkeypatch.setattr(collector.importlib.util, "find_spec", lambda name: object())
+    monkeypatch.setattr(collector, "crashes_in_a_separate_process", lambda name: "stopped with exit code 1 (boom)")
+    with pytest.raises(RuntimeError, match="RapidOCR could not start"):
+        collector.load_engine()
+
+
+def test_easyocr_is_used_quietly_about_crashes_when_the_fast_engine_is_not_installed(monkeypatch, capsys):
+    import sys
+    monkeypatch.delenv("OCR_ENGINE", raising=False)
+    monkeypatch.setattr(collector.importlib.util, "find_spec", lambda name: None)
+    monkeypatch.setattr(collector, "crashes_in_a_separate_process", mock.Mock(side_effect=AssertionError("nothing to test")))
+    fake_easyocr = mock.MagicMock()
+    fake_easyocr.Reader.return_value.readtext = "easyocr reader"
+    monkeypatch.setitem(sys.modules, "easyocr", fake_easyocr)
+
+    assert collector.load_engine() == ("easyocr", "easyocr reader")
+    assert "is not installed" in capsys.readouterr().out

@@ -32,6 +32,8 @@ def start_logging(profile, stop_event, error_event, keystroke_event, data_lock):
         logger.addHandler(syslog)
     except Exception as e:
         print(e)
+    # Stray spaces or quotes around the value in .env should not make it invalid
+    logging_level = logging_level.strip().strip("\"'").strip()
     match logging_level.lower():
         case "debug":
             logger.setLevel(logging.DEBUG)

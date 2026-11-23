@@ -110,14 +110,16 @@ def test_refresh_presses_back_and_trim_does_nothing(adb):
     assert adb.calls[-1][-1] == "input keyevent KEYCODE_BACK"
 
 
-def test_record_ad_records_pulls_and_cleans_up(adb, tmp_path):
+def test_record_ad_records_copies_and_cleans_up(adb, tmp_path):
+    adb.answers["cat /sdcard/tiktok_scraper_ad.mp4"] = b"video bytes"
     device = phone.PhoneDevice("R58M12ABCDE")
     result = device.record_ad(str(tmp_path), 20)
     assert result == {"video_path": str(tmp_path / "ad.mp4")}
+    assert (tmp_path / "ad.mp4").read_bytes() == b"video bytes"
     commands = [" ".join(call[2:]) for call in adb.calls]
     assert commands == [
         "shell screenrecord --time-limit 20 --bit-rate 4000000 /sdcard/tiktok_scraper_ad.mp4",
-        f"pull /sdcard/tiktok_scraper_ad.mp4 {tmp_path / 'ad.mp4'}",
+        "exec-out cat /sdcard/tiktok_scraper_ad.mp4",
         "shell rm /sdcard/tiktok_scraper_ad.mp4"
     ]
 

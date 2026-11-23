@@ -219,6 +219,9 @@ def scrape_tiktok(interface="web"):
                 capture_ad(device, session_dir, data_lock, processing_queue, impression_log)
     except KeyboardInterrupt:
         print("Keyboard interrupt detected. Exiting...")
+        # Close the last row now, so its end time is the moment of stopping and not when the other threads finish
+        if impression_log is not None:
+            impression_log.close("session_end")
         keystroke_event.set()
         processing_thread.join()
         logging_thread.join()

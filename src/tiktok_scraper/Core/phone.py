@@ -183,7 +183,10 @@ class PhoneDevice:
         # Record the phone's screen on the phone, then copy the video over. No sound is recorded.
         video_path = os.path.join(folder, "ad.mp4")
         self.shell(f"screenrecord --time-limit {int(seconds)} --bit-rate 4000000 {RECORDING_ON_PHONE}", timeout=seconds + 30)
-        self.adb("pull", RECORDING_ON_PHONE, video_path, timeout=120)
+        # Copied through adb's output, not "adb pull", so that no file path is handed to adb: the
+        # Windows adb.exe can then be used from WSL, where it would not understand a Linux path
+        with open(video_path, "wb") as file:
+            file.write(self.adb("exec-out", "cat", RECORDING_ON_PHONE, timeout=180))
         self.shell(f"rm {RECORDING_ON_PHONE}")
         return {"video_path": video_path}
 

@@ -1,12 +1,16 @@
 # Python Standard Library Dependencies
+import importlib.util
 import os
 import queue
 import shutil
+import subprocess
+import sys
 import time
 import traceback
 
 # External Dependency Imports
 import cv2
+import numpy
 
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
@@ -77,38 +81,89 @@ def load_engine():
     # Returns (name, function taking an image and returning EasyOCR-style [(box, text, confidence)])
     wanted = (os.environ.get("OCR_ENGINE") or "").strip().lower()
     if wanted in ["", "rapidocr"]:
-        try:
-            return "rapidocr", load_rapidocr()
-        except ImportError:
-            if wanted == "rapidocr":
-                raise
+        problems = []
+        # Two packages provide RapidOCR. Each is run once here: a missing model file or a broken
+        # onnxruntime only shows when the engine is first used, and it is better to find that out
+        # now, and move on to the next choice, than to stop at the first video.
+        for package, load in [("rapidocr_onnxruntime", load_rapidocr_onnxruntime_package), ("rapidocr", load_rapidocr_package)]:
+            if importlib.util.find_spec(package) is None:
+                problems.append(f"{package} is not installed")
+                continue
+            try:
+                # First in a separate Python: if the engine's own code crashes, it takes the whole
+                # program down with no error message, and that must not be this program
+                crash = crashes_in_a_separate_process(load.__name__)
+                if crash:
+                    problems.append(f"{load.__name__}: {crash}")
+                    continue
+                read = load()
+                read(numpy.zeros((64, 256, 3), dtype=numpy.uint8))
+                quiet_rapidocr_logging()
+                return "rapidocr", read
+            except Exception as error:
+                problems.append(f"{load.__name__}: {type(error).__name__}: {error}")
+        quiet_rapidocr_logging()
+        if wanted == "rapidocr":
+            raise RuntimeError("RapidOCR could not start. " + " | ".join(problems))
+        print("RapidOCR could not start, so EasyOCR is being used instead, which is slower.")
+        for problem in problems:
+            print("   " + problem)
+        print("To use RapidOCR, set up the Python 3.12 environment in environment.yml (see the README).")
     import easyocr
     reader = easyocr.Reader(['en'], gpu=False, verbose=False)
     return "easyocr", reader.readtext
 
 
-def load_rapidocr():
-    # Two packages provide RapidOCR; either will do
+def crashes_in_a_separate_process(loader_name):
+    # Loads the engine and reads one blank image in a second Python. Returns None if that worked,
+    # or a description of how it ended.
+    code = (
+        "import numpy\n"
+        "from tiktok_scraper.Core import collector\n"
+        f"collector.{loader_name}()(numpy.zeros((64, 256, 3), dtype=numpy.uint8))\n"
+    )
+    source_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    environment = dict(os.environ, PYTHONPATH=source_dir + os.pathsep + os.environ.get("PYTHONPATH", ""))
     try:
-        from rapidocr import RapidOCR
-        import logging
-        logging.getLogger("RapidOCR").setLevel(logging.ERROR)
-        engine = RapidOCR()
+        result = subprocess.run([sys.executable, "-c", code], capture_output=True, timeout=300, env=environment)
+    except subprocess.TimeoutExpired:
+        return "did not finish within 5 minutes"
+    if result.returncode == 0:
+        return None
+    last_line = (result.stderr.decode(errors="replace").strip().splitlines() or ["no error message"])[-1]
+    return f"stopped with exit code {result.returncode} ({last_line})"
 
-        def read(image):
-            output = engine(image)
-            if output.txts is None:
-                return []
-            return [(box.tolist(), text, float(score)) for box, text, score in zip(output.boxes, output.txts, output.scores)]
-        return read
-    except ImportError:
-        from rapidocr_onnxruntime import RapidOCR
-        engine = RapidOCR()
 
-        def read(image):
-            result, _ = engine(image)
-            return [(box, text, float(score)) for box, text, score in (result or [])]
-        return read
+def load_rapidocr_package():
+    # The newer package; it downloads its model files the first time it is used
+    from rapidocr import RapidOCR
+    engine = RapidOCR()
+
+    def read(image):
+        output = engine(image)
+        if output.txts is None:
+            return []
+        return [(box.tolist(), text, float(score)) for box, text, score in zip(output.boxes, output.txts, output.scores)]
+    return read
+
+
+def load_rapidocr_onnxruntime_package():
+    # The older package; its model files come with it, so it needs no download
+    from rapidocr_onnxruntime import RapidOCR
+    engine = RapidOCR()
+
+    def read(image):
+        result, _ = engine(image)
+        return [(box, text, float(score)) for box, text, score in (result or [])]
+    return read
+
+
+def quiet_rapidocr_logging():
+    # The package reports every step it takes; only its errors are wanted in the console
+    import logging
+    for name in list(logging.root.manager.loggerDict):
+        if "rapidocr" in name.lower():
+            logging.getLogger(name).setLevel(logging.ERROR)
 
 
 def engine_name():

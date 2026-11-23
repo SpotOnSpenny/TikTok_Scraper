@@ -1,16 +1,27 @@
+# Runtime dependencies for the collector. Tested on Python 3.12; use the conda environment in
+# environment.yml (conda env create -f environment.yml), which pins Python and installs this file.
+
+# Settings, data and uploads
 python-dotenv
-selenium
-opencv-python
-logging
-ffmpeg 
-beautifulsoup4
 pandas
 boto3
-pypiwin32
-pillow
-pytesseract
+numpy
+
+# Screen reading
+opencv-python
 fuzzywuzzy
 python-Levenshtein
-easyocr
-rapidocr
+# Fast OCR engine, preferred when it runs. 1.4.4 is the version the thresholds were checked with; it
+# needs Python below 3.13 (on 3.13 pip silently installs a very old release that does not work).
+rapidocr-onnxruntime==1.4.4; python_version < "3.13"
+rapidocr; python_version >= "3.13"
 onnxruntime
+# Slower OCR engine, used automatically when the fast one cannot start
+easyocr
+
+# Web interface
+selenium
+beautifulsoup4
+
+# BlueStacks interface (Windows only)
+pywin32; sys_platform == "win32"

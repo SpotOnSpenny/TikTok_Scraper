@@ -1,0 +1,12 @@
+# Python environment for the collector, pinned to the Python version it is tested on.
+#   conda env create -f environment.yml
+#   conda activate tiktok-scraper
+# After pulling new code:  conda env update -f environment.yml --prune
+name: tiktok-scraper
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - -r requirements.txt
