@@ -1,0 +1,94 @@
+{
+ "source": "hand-written",
+ "frame_time_s": null,
+ "detections": [
+  {
+   "bbox": [
+    [
+     20,
+     300
+    ],
+    [
+     200,
+     300
+    ],
+    [
+     200,
+     330
+    ],
+    [
+     20,
+     330
+    ]
+   ],
+   "text": "SharkHomeCanada",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     340
+    ],
+    [
+     428,
+     340
+    ],
+    [
+     428,
+     370
+    ],
+    [
+     20,
+     370
+    ]
+   ],
+   "text": "Prepare to be stripped of all your",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     375
+    ],
+    [
+     476,
+     375
+    ],
+    [
+     476,
+     405
+    ],
+    [
+     20,
+     405
+    ]
+   ],
+   "text": "cleaning responsibilities with the new",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     430
+    ],
+    [
+     140,
+     430
+    ],
+    [
+     140,
+     460
+    ],
+    [
+     20,
+     460
+    ]
+   ],
+   "text": "Learn more",
+   "conf": 0.9
+  }
+ ]
+}

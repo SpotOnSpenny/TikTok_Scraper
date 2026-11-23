@@ -1,11 +1,13 @@
 # Python Standard Library Dependencies
 import json
 import os
+import re
 
 # External Dependency Imports
 import numpy
 import pandas
 import pytest
+from fuzzywuzzy import fuzz
 
 # Internal Dependency Imports
 from conftest import load_results, fixture_names, FIXTURE_DIR
@@ -144,6 +146,12 @@ def s3_groups():
 
 
 @needs_s3
+def test_s3_fixtures_are_app_captures_only():
+    # Web-interface captures have hyphenated ids (20250205at183137-8M-vancouver) and a different layout
+    assert all("-" not in name for name in S3_NAMES)
+
+
+@needs_s3
 def test_s3_every_ad_shows_a_label_in_some_frame():
     missed = [
         ad for ad, names in s3_groups().items()
@@ -154,30 +162,55 @@ def test_s3_every_ad_shows_a_label_in_some_frame():
 
 @needs_s3
 def test_s3_label_is_read_in_most_frames():
-    # Some late frames are end cards with no label; 80 of 84 matched when this was set
+    # The misses are end cards with no label on screen; 115 of 120 matched when this was set
     hits = sum(match_label(load_results("s3", name))[0] is not None for name in S3_NAMES)
-    assert hits / len(S3_NAMES) >= 0.9
+    assert hits / len(S3_NAMES) >= 0.93
+
+
+@needs_s3
+def test_s3_only_labels_score_near_the_cutoff():
+    # Any line within reach of the cutoff must be a label or a piece of one, not caption text
+    near = {
+        text for name in S3_NAMES for _, text, _ in load_results("s3", name)
+        if max(fuzz.ratio(text, flag) for flag in SPONSORED_FLAGS) >= 60
+    }
+    not_label = [text for text in near if not re.search(r"spo|sor|pro|mot|ted|music", text.lower())]
+    assert not_label == []
 
 
 @needs_s3
 def test_s3_frames_of_one_ad_are_mostly_the_same_video():
-    # The misses are ads that switch to an end card or collapse their caption; 50 of 54 when set
+    # The misses are ads that switch to an end card; 76 of 80 when set
     pairs = [(first, second) for names in s3_groups().values() for first, second in zip(names, names[1:])]
     same = sum(same_video(s3_text(first), s3_text(second)) is True for first, second in pairs)
-    assert same / len(pairs) >= 0.9
+    assert same / len(pairs) >= 0.93
+
+
+# Two captures of one campaign with near-identical captions; judging them the same video is expected
+SAME_CAMPAIGN = [{"20250305at193913_18F_calgary", "20250313at125315_9F_calgary"}]
 
 
 @needs_s3
-def test_s3_different_ads_are_never_the_same_video():
-    groups = list(s3_groups().values())
+def test_s3_a_swipe_to_a_different_ad_is_never_the_same_video():
+    # What a swipe compares: any frame of one ad (on screen before) with the first frame of another (after)
+    groups = s3_groups()
     texts = {name: s3_text(name) for name in S3_NAMES}
-    wrong = [
-        (first, second)
-        for index, names in enumerate(groups) for other in groups[index + 1:]
-        for first in names for second in other
-        if same_video(texts[first], texts[second]) is True
-    ]
-    assert wrong == []
+    wrong = set()
+    for ad, names in groups.items():
+        for other, other_names in groups.items():
+            if ad == other or {ad, other} in SAME_CAMPAIGN:
+                continue
+            if any(same_video(texts[name], texts[other_names[0]]) is True for name in names):
+                wrong.add((ad, other))
+    assert wrong == set()
+
+
+def test_two_videos_from_one_account_are_different():
+    # The account name is shared, but it is not enough on its own
+    first = screen_text(synthetic("same_account_video_1"))
+    second = screen_text(synthetic("same_account_video_2"))
+    assert first["account"] == second["account"] == "SharkHomeCanada"
+    assert same_video(first, second) is False
 
 
 @needs_s3

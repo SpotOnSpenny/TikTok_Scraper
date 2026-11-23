@@ -21,7 +21,7 @@ from tiktok_scraper.Core.impression import read_region
 # (saved as JPEG) and the EasyOCR output for that crop (saved as JSON). The tests read
 # only the JSON, so they need no EasyOCR, PyTorch or win32.
 #
-#   python tools/make_fixtures.py s3 --count 30 --out tests/fixtures/s3
+#   python tools/make_fixtures.py s3 --count 40 --out tests/fixtures/s3      (app captures only by default)
 #   python tools/make_fixtures.py image shot1.png shot2.png --out tests/fixtures/capture
 #   python tools/make_fixtures.py video clip.mp4 --out tests/fixtures/capture
 #
@@ -98,6 +98,35 @@ def video_to_fixtures(video_path, out_dir, name, source):
         write_fixture(frame, out_dir, f"{name}_t{int(frame_time):02d}", source, frame_time)
 
 
+def capture_source(key):
+    # Ad ids from the web interface join their parts with hyphens (20250205at183137-8M-vancouver);
+    # ids from the app use underscores (20250213at125501_18f_calgary)
+    name = os.path.basename(key)
+    return "web" if re.match(r"^\d{8}at\d{6}-", name) else "app"
+
+
+def demographic_of(key):
+    parts = re.split(r"[-_]", os.path.splitext(os.path.basename(key))[0])
+    return parts[1].upper() if len(parts) > 1 else ""
+
+
+def spread_sample(keys, count, seed):
+    # A seeded sample that takes ads from each demographic in turn, so that the largest
+    # demographic does not crowd out the others
+    rng = random.Random(seed)
+    groups = {}
+    for key in keys:
+        groups.setdefault(demographic_of(key), []).append(key)
+    for group in groups.values():
+        rng.shuffle(group)
+    sample = []
+    while len(sample) < count and any(groups.values()):
+        for demographic in sorted(groups):
+            if groups[demographic] and len(sample) < count:
+                sample.append(groups[demographic].pop())
+    return sample
+
+
 def run_s3(args):
     import boto3
     from dotenv import load_dotenv
@@ -116,13 +145,20 @@ def run_s3(args):
                 keys.append(item["Key"])
     keys.sort()
     print(f"{len(keys)} videos in the bucket")
+    if args.source != "all":
+        keys = [key for key in keys if capture_source(key) == args.source]
+        print(f"{len(keys)} of them are {args.source} captures")
+    if args.exclude_dir and os.path.isdir(args.exclude_dir):
+        # Leave out ads that already have fixtures in another folder (for a held-out set)
+        taken = {name.rsplit("_t", 1)[0] for name in os.listdir(args.exclude_dir) if name.endswith(".json")}
+        keys = [key for key in keys if safe_name(os.path.splitext(os.path.basename(key))[0]) not in taken]
     if args.list:
         for key in keys:
             print(key)
         return
 
     # Seeded sample so the same fixture set can be rebuilt
-    sample = random.Random(args.seed).sample(keys, min(args.count, len(keys)))
+    sample = spread_sample(keys, args.count, args.seed)
     with tempfile.TemporaryDirectory() as temp_dir:
         for key in sorted(sample):
             video_path = os.path.join(temp_dir, "video.mp4")
@@ -157,6 +193,8 @@ if __name__ == '__main__':
     s3_mode.add_argument("--count", type=int, default=30)
     s3_mode.add_argument("--seed", type=int, default=20261119)
     s3_mode.add_argument("--list", action="store_true", help="only list the videos")
+    s3_mode.add_argument("--source", choices=["app", "web", "all"], default="app", help="which captures to sample (default: app)")
+    s3_mode.add_argument("--exclude-dir", default=None, help="skip ads that already have fixtures in this folder")
     s3_mode.add_argument("--out", default=os.path.join("tests", "fixtures", "s3"))
     s3_mode.set_defaults(run=run_s3)
 

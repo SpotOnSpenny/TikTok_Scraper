@@ -1,0 +1,94 @@
+{
+ "source": "hand-written",
+ "frame_time_s": null,
+ "detections": [
+  {
+   "bbox": [
+    [
+     20,
+     300
+    ],
+    [
+     200,
+     300
+    ],
+    [
+     200,
+     330
+    ],
+    [
+     20,
+     330
+    ]
+   ],
+   "text": "SharkHomeCanada",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     340
+    ],
+    [
+     488,
+     340
+    ],
+    [
+     488,
+     370
+    ],
+    [
+     20,
+     370
+    ]
+   ],
+   "text": "Compact flex design and full power with",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     375
+    ],
+    [
+     440,
+     375
+    ],
+    [
+     440,
+     405
+    ],
+    [
+     20,
+     405
+    ]
+   ],
+   "text": "Scalp Shield that protects new hair",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     20,
+     430
+    ],
+    [
+     140,
+     430
+    ],
+    [
+     140,
+     460
+    ],
+    [
+     20,
+     460
+    ]
+   ],
+   "text": "Learn more",
+   "conf": 0.9
+  }
+ ]
+}

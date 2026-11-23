@@ -19,8 +19,10 @@ from fuzzywuzzy import fuzz
 
 # Ad-system labels only. Creator "Paid partnership" is deliberately not in the default list.
 SPONSORED_FLAGS = ["Sponsored", "Paid Promotion", "Promoted Music"]
-# A label matches when fuzz.ratio is strictly above this
-LABEL_CUTOFF = 78
+# A label matches when fuzz.ratio is strictly above this. Set on 240 frames of 80 app-captured ads
+# (2026-11-23): every line scoring above 74 was a real label or a piece of one, such as a badge read
+# together with the text beside it ("Sponsored CK my", 75), and nothing else scored above 69.
+LABEL_CUTOFF = 74
 # OCR detections below this confidence are left out of the account and caption text
 TEXT_MIN_CONFIDENCE = 0.3
 # The part of the window that is read: the lower half, without the right-hand rail of
@@ -34,11 +36,15 @@ SCREEN_CHROME = ["Home", "Friends", "Inbox", "Profile", "See more"]
 CHROME_CUTOFF = 80
 NAV_BAR_START = 0.85
 # Two reads are the same video when their whole text is at least this similar...
-SAME_VIDEO_THRESHOLD = 70
-# ...or when they share a line this long that is this similar (a caption line survives
-# text inside the video changing between reads). Set on the S3 ad frames, 2026-11-19.
+SAME_VIDEO_THRESHOLD = 65
+# ...or when the lines they share (each at least this long and this similar) add up to at least
+# SHARED_LINES_MIN_TOTAL characters. Shared caption lines survive text inside the video changing
+# between reads; the total is there so that an account name alone is not enough, since two different
+# videos from one account share it. Set on the app-captured S3 ad frames, 2026-11-23, and checked on
+# a second set of 40 ads that was not used to choose the values.
 SHARED_LINE_MIN_LENGTH = 15
 SHARED_LINE_CUTOFF = 85
+SHARED_LINES_MIN_TOTAL = 30
 
 
 def read_region(image):
@@ -110,10 +116,11 @@ def same_video(previous, current, threshold=SAME_VIDEO_THRESHOLD):
         return True
     previous_lines = [line.lower() for line in previous["lines"] if len(line) >= SHARED_LINE_MIN_LENGTH]
     current_lines = [line.lower() for line in current["lines"] if len(line) >= SHARED_LINE_MIN_LENGTH]
-    return any(
-        fuzz.ratio(previous_line, current_line) >= SHARED_LINE_CUTOFF
-        for previous_line in previous_lines for current_line in current_lines
+    shared_characters = sum(
+        len(previous_line) for previous_line in previous_lines
+        if any(fuzz.ratio(previous_line, current_line) >= SHARED_LINE_CUTOFF for current_line in current_lines)
     )
+    return shared_characters >= SHARED_LINES_MIN_TOTAL
 
 
 def iso_time(timestamp):
