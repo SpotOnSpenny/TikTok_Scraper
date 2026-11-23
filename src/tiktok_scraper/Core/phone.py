@@ -2,6 +2,7 @@
 import os
 import re
 import subprocess
+import xml.etree.ElementTree as ElementTree
 
 # External Dependency Imports
 import cv2
@@ -19,7 +20,35 @@ import numpy
 
 TIKTOK_PACKAGES = ["com.zhiliaoapp.musically", "com.ss.android.ugc.trill"]
 RECORDING_ON_PHONE = "/sdcard/tiktok_scraper_ad.mp4"
+UI_DUMP_ON_PHONE = "/sdcard/tiktok_scraper_ui.xml"
 SWIPE_MILLISECONDS = 300
+
+
+def parse_ui_dump(raw):
+    # Turns the output of "uiautomator dump" into ([((left, top, right, bottom), text)], (width, height)):
+    # every element on screen that carries text, and the size of the screen. Returns None if raw holds no dump.
+    start = raw.find(b"<?xml")
+    end = raw.rfind(b"</hierarchy>")
+    if start < 0 or end < 0:
+        return None
+    try:
+        root = ElementTree.fromstring(raw[start:end + len(b"</hierarchy>")])
+    except ElementTree.ParseError:
+        return None
+    nodes = []
+    width, height = 0, 0
+    for node in root.iter("node"):
+        match = re.match(r"\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]", node.get("bounds") or "")
+        if not match:
+            continue
+        left, top, right, bottom = [int(value) for value in match.groups()]
+        width, height = max(width, right), max(height, bottom)
+        text = (node.get("text") or "").strip()
+        if text and right > left and bottom > top:
+            nodes.append(((left, top, right, bottom), text))
+    if width == 0 or height == 0:
+        return None
+    return nodes, (width, height)
 
 
 def adb_path():
@@ -76,6 +105,8 @@ class PhoneDevice:
     def __init__(self, serial):
         self.serial = serial
         self.size = None
+        # None until the first dump shows whether this phone can print it straight to adb
+        self.dump_to_stdout = None
 
     def adb(self, *arguments, timeout=30):
         return run_adb(["-s", self.serial] + list(arguments), timeout=timeout)
@@ -87,6 +118,10 @@ class PhoneDevice:
         # Wake the screen and keep it on while the phone is plugged in
         self.shell("input keyevent KEYCODE_WAKEUP")
         self.shell("svc power stayon true")
+        # The full screen size, so positions mean the same whether they come from a screenshot or from the phone's text
+        match = re.search(r"(\d+)x(\d+)", self.shell("wm size"))
+        if match:
+            self.size = (int(match.group(1)), int(match.group(2)))
 
     def close(self):
         # Let the screen time out normally again
@@ -99,6 +134,31 @@ class PhoneDevice:
             raise RuntimeError(f"Could not read a screenshot from phone {self.serial}")
         self.size = (image.shape[1], image.shape[0])
         return image
+
+    def read_text(self):
+        # The text Android reports for what is on screen, with where each piece sits: exact, and no
+        # image to analyse. Returns (nodes, screen size) as parse_ui_dump does, or None when the phone
+        # gives no dump (it can fail while the screen will not hold still), so the caller can fall
+        # back to reading a screenshot.
+        try:
+            found = None
+            if self.dump_to_stdout is not False:
+                found = parse_ui_dump(self.adb("exec-out", "uiautomator", "dump", "/dev/tty", timeout=20))
+                if found is not None:
+                    self.dump_to_stdout = True
+                elif self.dump_to_stdout is None:
+                    # This phone does not print the dump directly; write it to a file and read that from now on
+                    self.dump_to_stdout = False
+            if self.dump_to_stdout is False:
+                self.shell(f"uiautomator dump {UI_DUMP_ON_PHONE}", timeout=20)
+                found = parse_ui_dump(self.adb("exec-out", "cat", UI_DUMP_ON_PHONE, timeout=20))
+        except (RuntimeError, subprocess.TimeoutExpired):
+            return None
+        if found is None:
+            return None
+        nodes, dumped_size = found
+        # The dump leaves out the system bar at the bottom, so use the full screen size when it is known
+        return nodes, self.size or dumped_size
 
     def swipe_up(self):
         # Drag from three quarters of the way down the screen to one quarter, in the middle

@@ -37,7 +37,8 @@ def load(folder):
         name = os.path.splitext(os.path.basename(path))[0]
         frames[name] = {
             "results": [(d["bbox"], d["text"], d["conf"]) for d in data["detections"]],
-            "height": data["crop_size"][1]
+            "height": data["crop_size"][1],
+            "width": data["crop_size"][0]
         }
     ads = {}
     for name in frames:
@@ -46,14 +47,14 @@ def load(folder):
 
 
 def label_report(frames, ads, cutoff):
-    frame_hits = sum(impression.match_label(frame["results"], cutoff=cutoff)[0] is not None for frame in frames.values())
-    ad_hits = sum(any(impression.match_label(frames[name]["results"], cutoff=cutoff)[0] for name in names) for names in ads.values())
-    first_hits = sum(impression.match_label(frames[names[0]]["results"], cutoff=cutoff)[0] is not None for names in ads.values())
+    frame_hits = sum(impression.match_label(frame["results"], cutoff=cutoff, width=frame["width"])[0] is not None for frame in frames.values())
+    ad_hits = sum(any(impression.match_label(frames[name]["results"], cutoff=cutoff, width=frames[name]["width"])[0] for name in names) for names in ads.values())
+    first_hits = sum(impression.match_label(frames[names[0]]["results"], cutoff=cutoff, width=frames[names[0]]["width"])[0] is not None for names in ads.values())
     return frame_hits, ad_hits, first_hits
 
 
 def video_report(frames, ads):
-    texts = {name: impression.screen_text(frame["results"], height=frame["height"]) for name, frame in frames.items()}
+    texts = {name: impression.screen_text(frame["results"], height=frame["height"], width=frame["width"]) for name, frame in frames.items()}
     same = [(first, second) for names in ads.values() for first, second in zip(names, names[1:])]
     groups = list(ads.values())
     different = [(first, second) for one, two in itertools.combinations(groups, 2) for first in one for second in two]

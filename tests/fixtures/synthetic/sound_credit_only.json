@@ -1,0 +1,32 @@
+{
+ "source": "hand-written",
+ "frame_time_s": null,
+ "crop_size": [
+  459,
+  480
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     18,
+     430
+    ],
+    [
+     306,
+     430
+    ],
+    [
+     306,
+     456
+    ],
+    [
+     18,
+     456
+    ]
+   ],
+   "text": "original sound - yvljayo",
+   "conf": 0.9
+  }
+ ]
+}

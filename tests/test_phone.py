@@ -123,10 +123,20 @@ def test_record_ad_records_pulls_and_cleans_up(adb, tmp_path):
 
 
 def test_prepare_and_close_set_stay_awake(adb):
+    adb.answers["wm size"] = b"Physical size: 1080x2280\n"
     device = phone.PhoneDevice("R58M12ABCDE")
     device.prepare()
     device.close()
-    assert [call[-1] for call in adb.calls] == ["input keyevent KEYCODE_WAKEUP", "svc power stayon true", "svc power stayon false"]
+    assert [call[-1] for call in adb.calls] == ["input keyevent KEYCODE_WAKEUP", "svc power stayon true", "wm size", "svc power stayon false"]
+    assert device.size == (1080, 2280)
+
+
+def test_read_text_reports_the_full_screen_size_once_known(adb):
+    adb.answers["uiautomator dump /dev/tty"] = UI_DUMP.replace(b"[0,0][1080,2280]", b"[0,0][1080,2226]")
+    device = phone.PhoneDevice("R58M12ABCDE")
+    assert device.read_text()[1] == (1080, 2226)
+    device.size = (1080, 2280)
+    assert device.read_text()[1] == (1080, 2280)
 
 
 def test_describe_reads_model_and_tiktok_version(adb):
@@ -164,3 +174,58 @@ def test_missing_adb_gives_a_plain_message(monkeypatch):
     monkeypatch.setattr(phone.subprocess, "run", missing)
     with pytest.raises(RuntimeError, match="adb was not found"):
         phone.list_phones()
+
+
+# ------------------------------ on-screen text from the phone ------------------------------
+
+UI_DUMP = (
+    b"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><hierarchy rotation=\"0\">"
+    b"<node index=\"0\" text=\"\" class=\"android.widget.FrameLayout\" bounds=\"[0,0][1080,2280]\">"
+    b"<node text=\"For You\" resource-id=\"x:id/text1\" class=\"android.widget.TextView\" bounds=\"[567,101][788,297]\" />"
+    b"<node text=\"Shayne Vibes Truth\" resource-id=\"x:id/title\" class=\"android.widget.TextView\" bounds=\"[41,1710][536,1778]\" />"
+    b"<node text=\"\" content-desc=\"Like\" class=\"android.widget.ImageView\" bounds=\"[894,949][1046,1101]\" />"
+    b"<node text=\"Ad\" resource-id=\"x:id/fux\" class=\"android.widget.TextView\" bounds=\"[58,1883][99,1927]\" />"
+    b"<node text=\"hidden\" class=\"android.widget.TextView\" bounds=\"[0,0][0,0]\" />"
+    b"</node></hierarchy>"
+)
+
+
+def test_parse_ui_dump_keeps_visible_text_and_the_screen_size():
+    nodes, size = phone.parse_ui_dump(UI_DUMP + b"UI hierchary dumped to: /dev/tty\n")
+    assert size == (1080, 2280)
+    assert nodes == [((567, 101, 788, 297), "For You"), ((41, 1710, 536, 1778), "Shayne Vibes Truth"), ((58, 1883, 99, 1927), "Ad")]
+
+
+@pytest.mark.parametrize("raw", [b"", b"ERROR: could not get idle state.\n", b"<?xml version='1.0'?><hierarchy><node bounds=", b"<?xml?><hierarchy></hierarchy>"])
+def test_parse_ui_dump_is_none_without_a_usable_dump(raw):
+    assert phone.parse_ui_dump(raw) is None
+
+
+def test_read_text_takes_the_dump_straight_from_adb(adb):
+    adb.answers["uiautomator dump /dev/tty"] = UI_DUMP
+    device = phone.PhoneDevice("R58M12ABCDE")
+    nodes, size = device.read_text()
+    assert size == (1080, 2280) and len(nodes) == 3
+    assert adb.calls == [["-s", "R58M12ABCDE", "exec-out", "uiautomator", "dump", "/dev/tty"]]
+
+
+def test_read_text_switches_to_a_file_on_phones_that_do_not_print_the_dump(adb):
+    adb.answers["cat /sdcard/tiktok_scraper_ui.xml"] = UI_DUMP
+    device = phone.PhoneDevice("R58M12ABCDE")
+    assert len(device.read_text()[0]) == 3
+    assert len(device.read_text()[0]) == 3
+    commands = [" ".join(call[2:]) for call in adb.calls]
+    # The direct way is tried once, then the file way is used from then on
+    assert commands == [
+        "exec-out uiautomator dump /dev/tty",
+        "shell uiautomator dump /sdcard/tiktok_scraper_ui.xml", "exec-out cat /sdcard/tiktok_scraper_ui.xml",
+        "shell uiautomator dump /sdcard/tiktok_scraper_ui.xml", "exec-out cat /sdcard/tiktok_scraper_ui.xml",
+    ]
+
+
+def test_read_text_is_none_when_the_phone_cannot_dump(adb):
+    adb.answers["uiautomator dump /dev/tty"] = UI_DUMP
+    device = phone.PhoneDevice("R58M12ABCDE")
+    assert device.read_text() is not None
+    adb.answers["uiautomator dump /dev/tty"] = b"ERROR: could not get idle state.\n"
+    assert device.read_text() is None

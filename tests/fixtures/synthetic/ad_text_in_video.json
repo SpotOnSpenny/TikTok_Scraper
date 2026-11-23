@@ -1,0 +1,98 @@
+{
+ "source": "hand-written",
+ "frame_time_s": null,
+ "crop_size": [
+  459,
+  480
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     210,
+     120
+    ],
+    [
+     270,
+     120
+    ],
+    [
+     270,
+     146
+    ],
+    [
+     210,
+     146
+    ]
+   ],
+   "text": "AD",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     18,
+     290
+    ],
+    [
+     186,
+     290
+    ],
+    [
+     186,
+     316
+    ],
+    [
+     18,
+     316
+    ]
+   ],
+   "text": "cookingwithsam",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     18,
+     330
+    ],
+    [
+     354,
+     330
+    ],
+    [
+     354,
+     356
+    ],
+    [
+     18,
+     356
+    ]
+   ],
+   "text": "Trying the viral pasta again",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     18,
+     432
+    ],
+    [
+     390,
+     432
+    ],
+    [
+     390,
+     458
+    ],
+    [
+     18,
+     458
+    ]
+   ],
+   "text": "original sound - cookingwithsam",
+   "conf": 0.9
+  }
+ ]
+}

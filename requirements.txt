@@ -12,3 +12,5 @@ pytesseract
 fuzzywuzzy
 python-Levenshtein
 easyocr
+rapidocr
+onnxruntime

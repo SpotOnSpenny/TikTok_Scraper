@@ -23,6 +23,13 @@ SPONSORED_FLAGS = ["Sponsored", "Paid Promotion", "Promoted Music"]
 # (2026-11-23): every line scoring above 74 was a real label or a piece of one, such as a badge read
 # together with the text beside it ("Sponsored CK my", 75), and nothing else scored above 69.
 LABEL_CUTOFF = 74
+# The current app (seen on a phone, 2026-11-23) marks ads with a small grey "Ad" badge at the left
+# edge, under the caption, where the older app wrote "Sponsored". Two letters are too few to match
+# loosely, so a badge must read exactly as one of these (ignoring case and stray punctuation) and,
+# when the width of the read region is known, sit at the left edge and be no wider than a badge.
+BADGE_LABELS = ["Ad"]
+BADGE_MAX_LEFT = 0.15
+BADGE_MAX_WIDTH = 0.15
 # OCR detections below this confidence are left out of the account and caption text
 TEXT_MIN_CONFIDENCE = 0.3
 # The part of the window that is read: the lower half, without the right-hand rail of
@@ -45,6 +52,9 @@ SAME_VIDEO_THRESHOLD = 65
 SHARED_LINE_MIN_LENGTH = 15
 SHARED_LINE_CUTOFF = 85
 SHARED_LINES_MIN_TOTAL = 30
+# The sound credit under the caption, which is the same for every video from one account
+SOUND_CREDIT = "original sound"
+SOUND_CREDIT_CUTOFF = 85
 
 
 def read_region(image):
@@ -54,9 +64,29 @@ def read_region(image):
     return image[height // 2:(height // 2) * 2, 0:int(width * READ_WIDTH_SHARE)]
 
 
-def match_label(results, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF):
+def badge_label(bbox, text, width=None):
+    # Returns the badge this detection is ("Ad"), or None
+    cleaned = str(text).strip(" .:;,_-|[]()'\"").lower()
+    for badge in BADGE_LABELS:
+        if cleaned != badge.lower():
+            continue
+        if width:
+            left = min(point[0] for point in bbox)
+            right = max(point[0] for point in bbox)
+            if left > width * BADGE_MAX_LEFT or right - left > width * BADGE_MAX_WIDTH:
+                continue
+        return badge
+    return None
+
+
+def match_label(results, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF, width=None):
     # Returns (flag, score, matched_text) for the best label match on screen.
-    # flag is None when the best score is not above the cutoff.
+    # flag is None when no badge is found and the best score is not above the cutoff.
+    # width is the width of the read region, used to check where a badge sits.
+    for bbox, text, _ in results:
+        badge = badge_label(bbox, text, width)
+        if badge is not None:
+            return badge, 100, text
     best_flag, best_score, best_text = None, 0, None
     for detection in results:
         for flag in flags:
@@ -77,7 +107,7 @@ def is_chrome(text, top, height):
     return False
 
 
-def screen_text(results, height=None, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF, min_confidence=TEXT_MIN_CONFIDENCE):
+def screen_text(results, height=None, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF, min_confidence=TEXT_MIN_CONFIDENCE, width=None):
     # Splits what was read into a best-effort account (top line) and caption (the rest).
     # Label matches, app furniture and low-confidence detections are dropped. height is the
     # height of the read region, used to find the navigation bar. Provisional until the
@@ -88,6 +118,8 @@ def screen_text(results, height=None, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF
         if text == "" or confidence < min_confidence:
             continue
         if any(fuzz.ratio(text, flag) > cutoff for flag in flags):
+            continue
+        if badge_label(bbox, text, width) is not None:
             continue
         top = min(point[1] for point in bbox)
         left = min(point[0] for point in bbox)
@@ -103,22 +135,37 @@ def screen_text(results, height=None, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF
     }
 
 
+def identifying_lines(text):
+    # The lines that say which video this is. The sound credit ("original sound - account") is left
+    # out: every video from one account carries the same one, so it would make them all look alike.
+    return [
+        line.lower() for line in text["lines"]
+        if fuzz.partial_ratio(line.lower(), SOUND_CREDIT) < SOUND_CREDIT_CUTOFF
+    ]
+
+
 def same_video(previous, current, threshold=SAME_VIDEO_THRESHOLD):
     # Compares the text of two reads. True: same video (the swipe did not advance).
     # False: a different video. None: neither read has any text, so it cannot be told.
-    previous_text = " ".join(previous["lines"]).lower()
-    current_text = " ".join(current["lines"]).lower()
-    if previous_text == "" and current_text == "":
+    if not previous["lines"] and not current["lines"]:
         return None
+    previous_lines = identifying_lines(previous)
+    current_lines = identifying_lines(current)
+    previous_text = " ".join(previous_lines)
+    current_text = " ".join(current_lines)
     if previous_text == "" or current_text == "":
-        return False
+        if previous_text != current_text:
+            # One read has a caption or account and the other has none
+            return False
+        # Both reads are nothing but a sound credit, so the credits are all there is to compare
+        return fuzz.ratio(" ".join(previous["lines"]).lower(), " ".join(current["lines"]).lower()) >= threshold
     if fuzz.token_sort_ratio(previous_text, current_text) >= threshold:
         return True
-    previous_lines = [line.lower() for line in previous["lines"] if len(line) >= SHARED_LINE_MIN_LENGTH]
-    current_lines = [line.lower() for line in current["lines"] if len(line) >= SHARED_LINE_MIN_LENGTH]
+    previous_long = [line for line in previous_lines if len(line) >= SHARED_LINE_MIN_LENGTH]
+    current_long = [line for line in current_lines if len(line) >= SHARED_LINE_MIN_LENGTH]
     shared_characters = sum(
-        len(previous_line) for previous_line in previous_lines
-        if any(fuzz.ratio(previous_line, current_line) >= SHARED_LINE_CUTOFF for current_line in current_lines)
+        len(previous_line) for previous_line in previous_long
+        if any(fuzz.ratio(previous_line, current_line) >= SHARED_LINE_CUTOFF for current_line in current_long)
     )
     return shared_characters >= SHARED_LINES_MIN_TOTAL
 
@@ -162,7 +209,7 @@ class ImpressionLog:
             return None
         return self.current["swipes"][-1]["at"]
 
-    def open(self, shown_at, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=True, first_read_at=None):
+    def open(self, shown_at, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=True, first_read_at=None, text_source=None):
         # shown_at is when the video came on screen; first_read_at is when it was first read
         self.index += 1
         self.current = {
@@ -177,6 +224,7 @@ class ImpressionLog:
             "scoring_ms": scoring_ms,
             "frame_path": frame_path,
             "advance_confirmed": advance_confirmed,
+            "text_source": text_source,
             "reads": 1,
             "label_read": 1 if flag is not None else None,
             "stuck_refreshes": 0,
@@ -190,10 +238,20 @@ class ImpressionLog:
     def swipe_count(self):
         return len(self.current["swipes"]) if self.current else 0
 
-    def note_read(self):
-        # The video on screen was read again and found to be the same one
+    def read_count(self):
+        return self.current["reads"] if self.current else 0
+
+    def shown_time(self):
+        # When the video on screen came on screen
+        return self.current["shown_at"] if self.current else None
+
+    def note_read(self, text=None):
+        # The video on screen was read again. If the first read found no text (the video was still
+        # loading) and this one did, keep this one's account and caption.
         if self.current is not None:
             self.current["reads"] += 1
+            if text is not None and text["lines"] and not self.current["text"]["lines"]:
+                self.current["text"] = text
 
     def mark_ad(self, flag, score, matched_text):
         # The label was not there on the first read of this video but is there now
@@ -246,6 +304,7 @@ class ImpressionLog:
             "swipe_attempts": len(swipes),
             "advance_confirmed": current["advance_confirmed"],
             "ocr_ms": current["ocr_ms"],
+            "text_source": current["text_source"],
             "scoring_ms": current["scoring_ms"],
             "frame_path": frame_path,
             "close_reason": reason

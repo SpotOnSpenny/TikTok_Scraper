@@ -10,7 +10,7 @@ import cv2
 
 # Internal Dependency Imports
 from tiktok_scraper.Core.global_vars import monitoring_data
-from tiktok_scraper.Core.impression import match_label, screen_text, same_video, read_region
+from tiktok_scraper.Core.impression import match_label, screen_text, same_video, read_region, READ_WIDTH_SHARE
 
 #######################################################################################
 #                                        Notes:                                       #
@@ -29,41 +29,194 @@ from tiktok_scraper.Core.impression import match_label, screen_text, same_video,
 STUCK_SWIPE_LIMIT = 5
 # Seconds of each ad that are recorded
 AD_CAPTURE_SECONDS = 20
-# Frames are brought to this width before they are read and stored, so that a phone's
-# 1080-wide screen costs the same OCR time, and reads the same, as the 540-wide emulator
+# Stored frames are brought to this width, so a phone's 1080-wide screen and the 540-wide emulator
+# give frames, text positions and thresholds on the same scale
 FRAME_WIDTH = 540
+# Seconds to wait after a swipe before the first read, for the next video to settle
+SETTLE_SECONDS = 1
+# Seconds between reads of the same video
+REREAD_GAP_SECONDS = 0.3
 
-_reader = None
+# Each video is read at least READS_PER_VIDEO times before it is swiped away: the label can render
+# late or be misread on one frame, and any read that shows it starts the ad capture.
+# How long a video is then watched is decided by watch_seconds() below. DWELL_SECONDS is the fixed
+# answer it gives for now; set it to 0 to swipe as soon as the reads are done.
+# Both can be set in src/.env, which configure_from_environment() applies once it is loaded.
+DWELL_SECONDS = 5.0
+READS_PER_VIDEO = 2
+
+# Which OCR engine reads the screen: "rapidocr" (fast) or "easyocr" (slow, the original). With
+# OCR_ENGINE unset, RapidOCR is used when it is installed and EasyOCR otherwise.
+# OCR_SCALE is how much larger than a stored frame the image given to the engine is. RapidOCR is
+# given a phone's screenshot at its own resolution, not the stored half-size frame. On enlarged
+# fixture frames (2026-11-23) the older rapidocr-onnxruntime package read more labels at double
+# size (115 of 120 against 111); the newer rapidocr package read the same either way.
+OCR_SCALE = {"rapidocr": 2, "easyocr": 1}
+
+# How the screen is read. "ocr" (the default) reads a screenshot, and when that finds no text at all
+# on a phone it asks the phone for the text on screen as a backup. "ui" asks the phone first and uses
+# OCR only when the phone gives nothing. The phone's text is exact, but on the test Pixel a request
+# took about 5 seconds against well under 1 for OCR, so it is the backup, not the main reader.
+# Set SCREEN_READER in src/.env to change it.
+SCREEN_READER = "ocr"
+
+_engine = None
+
+
+def configure_from_environment():
+    global DWELL_SECONDS, READS_PER_VIDEO, SCREEN_READER
+    if (os.environ.get("SCREEN_READER") or "").strip().lower() in ["ocr", "ui"]:
+        SCREEN_READER = os.environ["SCREEN_READER"].strip().lower()
+    if os.environ.get("DWELL_SECONDS"):
+        DWELL_SECONDS = float(os.environ["DWELL_SECONDS"])
+    if os.environ.get("READS_PER_VIDEO"):
+        READS_PER_VIDEO = max(1, int(os.environ["READS_PER_VIDEO"]))
+
+
+def load_engine():
+    # Returns (name, function taking an image and returning EasyOCR-style [(box, text, confidence)])
+    wanted = (os.environ.get("OCR_ENGINE") or "").strip().lower()
+    if wanted in ["", "rapidocr"]:
+        try:
+            return "rapidocr", load_rapidocr()
+        except ImportError:
+            if wanted == "rapidocr":
+                raise
+    import easyocr
+    reader = easyocr.Reader(['en'], gpu=False, verbose=False)
+    return "easyocr", reader.readtext
+
+
+def load_rapidocr():
+    # Two packages provide RapidOCR; either will do
+    try:
+        from rapidocr import RapidOCR
+        import logging
+        logging.getLogger("RapidOCR").setLevel(logging.ERROR)
+        engine = RapidOCR()
+
+        def read(image):
+            output = engine(image)
+            if output.txts is None:
+                return []
+            return [(box.tolist(), text, float(score)) for box, text, score in zip(output.boxes, output.txts, output.scores)]
+        return read
+    except ImportError:
+        from rapidocr_onnxruntime import RapidOCR
+        engine = RapidOCR()
+
+        def read(image):
+            result, _ = engine(image)
+            return [(box, text, float(score)) for box, text, score in (result or [])]
+        return read
+
+
+def engine_name():
+    global _engine
+    if _engine is None:
+        _engine = load_engine()
+    return _engine[0]
 
 
 def ocr(region):
-    # EasyOCR is loaded on first use so that this module can be imported without it
-    global _reader
-    if _reader is None:
-        import easyocr
-        _reader = easyocr.Reader(['en'], gpu=False, verbose=False)
-    return _reader.readtext(region)
+    # The engine is loaded on first use so that this module can be imported without one installed
+    global _engine
+    if _engine is None:
+        _engine = load_engine()
+    return _engine[1](region)
 
 
-def normalise_frame(image):
-    height, width = image.shape[:2]
-    if width <= FRAME_WIDTH * 1.1:
+def normalise_frame(image, width=FRAME_WIDTH):
+    height, original_width = image.shape[:2]
+    if abs(original_width - width) <= width * 0.1:
         return image
-    return cv2.resize(image, (FRAME_WIDTH, round(height * FRAME_WIDTH / width)), interpolation=cv2.INTER_AREA)
+    interpolation = cv2.INTER_AREA if original_width > width else cv2.INTER_CUBIC
+    return cv2.resize(image, (width, round(height * width / original_width)), interpolation=interpolation)
+
+
+def ui_results(nodes, screen_size):
+    # Puts the text elements a phone reports into the same form as OCR results: [(box, text, confidence)]
+    # for the read region (lower half, count rail removed), on the scale of a stored frame.
+    # Returns (results, region width, region height).
+    screen_width, screen_height = screen_size
+    scale = FRAME_WIDTH / screen_width
+    frame_height = round(screen_height * scale)
+    region_top = frame_height // 2
+    region_height = frame_height // 2
+    region_width = int(FRAME_WIDTH * READ_WIDTH_SHARE)
+    results = []
+    for (left, top, right, bottom), text in nodes:
+        left, top, right, bottom = left * scale, top * scale - region_top, right * scale, bottom * scale - region_top
+        centre_x, centre_y = (left + right) / 2, (top + bottom) / 2
+        if not (0 <= centre_x < region_width and 0 <= centre_y < region_height):
+            continue
+        results.append(([[left, top], [right, top], [right, bottom], [left, bottom]], text, 1.0))
+    return results, region_width, region_height
 
 
 def read_screen(device):
-    # Returns (full-screen image, EasyOCR results for the read region, height of that region, OCR time in ms)
-    image = normalise_frame(device.read_frame())
+    # Reads what is on screen. Returns a dict:
+    #   results        [(box, text, confidence)] for the read region, positions on the stored-frame scale
+    #   region_width, region_height   size of the read region on that scale
+    #   read_ms        how long the read took
+    #   source         the name of the OCR engine, "ui", or "ui-backup" when OCR found nothing and the phone's text was used
+    #   image          the stored-size screenshot if one was taken for this read, else None
+    read_start = time.perf_counter()
+    if SCREEN_READER == "ui" and hasattr(device, "read_text"):
+        found = device.read_text()
+        if found is not None:
+            results, region_width, region_height = ui_results(*found)
+            return {
+                "results": results, "region_width": region_width, "region_height": region_height,
+                "read_ms": round((time.perf_counter() - read_start) * 1000, 1), "source": "ui", "image": None
+            }
 
-    # Read the lower half of the screen, where the account, the whole caption and the "Sponsored" badge
-    # sit, without the right-hand count rail. The colour image is read as it is: on the S3 ad frames an
+    original = device.read_frame()
+    image = normalise_frame(original)
+
+    # Read the lower half of the screen, where the account, the whole caption and the ad label sit,
+    # without the right-hand count rail. The colour image is read as it is: on the S3 ad frames an
     # Otsu threshold lost the label in about a third of frames, and the left half alone cut the captions short.
     ocr_start = time.perf_counter()
-    region = read_region(image)
-    results = ocr(region)
-    ocr_ms = round((time.perf_counter() - ocr_start) * 1000, 1)
-    return image, results, region.shape[0], ocr_ms
+    scale = OCR_SCALE.get(engine_name(), 1)
+    if scale == 1:
+        region = read_region(image)
+        results = ocr(region)
+    else:
+        # A phone's screenshot already has the extra detail; an emulator's is enlarged
+        large = read_region(normalise_frame(original, FRAME_WIDTH * scale))
+        results = [
+            ([[point[0] / scale, point[1] / scale] for point in box], text, confidence)
+            for box, text, confidence in ocr(large)
+        ]
+        region = read_region(image)
+    reading = {
+        "results": results, "region_width": region.shape[1], "region_height": region.shape[0],
+        "read_ms": round((time.perf_counter() - ocr_start) * 1000, 1), "source": engine_name(), "image": image
+    }
+
+    # Backup: OCR found nothing to go on (no label, no account, no caption), which happens while a
+    # video is loading or when the text is in a script the engine cannot read. Ask the phone instead.
+    nothing_read = (
+        match_label(results, width=reading["region_width"])[0] is None
+        and not screen_text(results, height=reading["region_height"], width=reading["region_width"])["lines"]
+    )
+    if nothing_read and SCREEN_READER == "ocr" and hasattr(device, "read_text"):
+        found = device.read_text()
+        if found is not None:
+            backup_results, _, _ = ui_results(*found)
+            if backup_results:
+                reading["results"] = backup_results
+                reading["source"] = "ui-backup"
+                reading["read_ms"] = round((time.perf_counter() - ocr_start) * 1000, 1)
+    return reading
+
+
+def watch_seconds(text):
+    # How long the video on screen should be watched before it is swiped away, given its account and
+    # caption. Every video gets the same time for now. This is where the interest scorer will decide:
+    # next to nothing for a video the account should not care about, longer for one it should.
+    return DWELL_SECONDS
 
 
 def leave_video(device, impression_log):
@@ -94,59 +247,69 @@ def leave_video(device, impression_log):
 
 
 def find_ad(device, impression_log):
+    # Watches videos, swiping past the ones that are not ads, and returns when an ad is on screen
     global monitoring_data
-    ad_found = False
-    while ad_found is False:
-        time.sleep(1)
-        # Start timer for process
-        start_time = time.time()
+    just_swiped = True
+    while True:
+        # After a swipe give the next video a moment to settle; between reads of one video, a short gap
+        time.sleep(SETTLE_SECONDS if just_swiped else REREAD_GAP_SECONDS)
+        just_swiped = False
+        read_started = time.time()
 
         # Read the screen once; the same OCR results feed the label check, the swipe check and the log
-        image, results, region_height, ocr_ms = read_screen(device)
+        reading = read_screen(device)
+        results = reading["results"]
         scoring_start = time.perf_counter()
-        flag, score, matched_text = match_label(results)
-        text = screen_text(results, height=region_height)
+        flag, score, matched_text = match_label(results, width=reading["region_width"])
+        text = screen_text(results, height=reading["region_height"], width=reading["region_width"])
         previous_text = impression_log.current_text()
-        same = same_video(previous_text, text) if previous_text is not None else False
+        if previous_text is None:
+            same = False
+        elif impression_log.swipe_count() == 0:
+            # No swipe has been sent since this video was opened, so this is another look at it
+            same = True
+        else:
+            same = same_video(previous_text, text)
         scoring_ms = round((time.perf_counter() - scoring_start) * 1000, 1)
 
         if same is True:
-            impression_log.note_read()
+            impression_log.note_read(text)
             if flag is not None and not impression_log.is_ad():
-                # Same video as before, but the label is on screen now: it rendered late, or this was
-                # wrongly judged the same. Either way an ad is showing that has not been captured.
+                # The label was not read at first but is on screen now: it rendered late, was misread
+                # the first time, or a swipe was wrongly judged to have failed. An ad is showing.
                 print("Ad found on a later read at index: " + str(monitoring_data["data_index"]))
                 impression_log.mark_ad(flag, score, matched_text)
-                ad_found = True
-            else:
+                return
+            if impression_log.swipe_count() > 0:
                 # The text on screen has not changed, so the last swipe did not advance. Swipe again without counting.
                 print("Swipe not confirmed at index: " + str(monitoring_data["data_index"]) + ", swiping again")
                 leave_video(device, impression_log)
+                just_swiped = True
+                continue
         else:
             # A new video: write the row for the one just left, count this one and store its frame.
             # A read with no text is still counted, but flagged, since nothing shows that the video changed.
             # This video came on screen when the previous one was swiped away, not when it was first read
-            shown_at = impression_log.last_swipe_time() or start_time
+            shown_at = impression_log.last_swipe_time() or read_started
             if impression_log.has_open():
                 impression_log.close("advanced")
                 monitoring_data["data_index"] += 1
             monitoring_data["videos_watched"] += 1
             frame_path = impression_log.next_frame_path()
+            # A read that took its text from the phone has no screenshot yet; take the one stored frame now
+            image = reading["image"] if reading["image"] is not None else normalise_frame(device.read_frame())
             cv2.imwrite(frame_path, image, [cv2.IMWRITE_JPEG_QUALITY, 80])
-            impression_log.open(shown_at, text, flag, score, matched_text, ocr_ms, scoring_ms, frame_path, advance_confirmed=len(text["lines"]) > 0, first_read_at=start_time)
+            impression_log.open(shown_at, text, flag, score, matched_text, reading["read_ms"], scoring_ms, frame_path, advance_confirmed=len(text["lines"]) > 0, first_read_at=read_started, text_source=reading["source"])
             if flag is not None:
                 print("Ad found at index: " + str(monitoring_data["data_index"]))
-                ad_found = True
-            else:
-                print("No ad found at index: " + str(monitoring_data["data_index"]))
-                leave_video(device, impression_log)
-        # End timer for process to nearest second
-        end_time = time.time()
-        time_elapsed = (end_time - start_time).__round__(2)
-        print(f"Time elapsed determining if ad or not: {time_elapsed}")
-        if time_elapsed < 5:
-            wait = 5 - time_elapsed
-            time.sleep(wait)
+                return
+
+        # Not an ad so far. Keep watching until the video has had its time and its reads, then move on.
+        watched = time.time() - impression_log.shown_time()
+        if impression_log.read_count() >= READS_PER_VIDEO and watched >= watch_seconds(impression_log.current_text()):
+            print(f"No ad found at index: {monitoring_data['data_index']} ({impression_log.read_count()} reads, {round(watched, 1)}s)")
+            leave_video(device, impression_log)
+            just_swiped = True
 
 
 def capture_ad(device, output_dir, data_lock, job_queue, impression_log):

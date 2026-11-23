@@ -1,0 +1,76 @@
+{
+ "source": "hand-written",
+ "frame_time_s": null,
+ "crop_size": [
+  459,
+  480
+ ],
+ "detections": [
+  {
+   "bbox": [
+    [
+     18,
+     300
+    ],
+    [
+     174,
+     300
+    ],
+    [
+     174,
+     326
+    ],
+    [
+     18,
+     326
+    ]
+   ],
+   "text": "Tyler Vitelli",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     18,
+     340
+    ],
+    [
+     174,
+     340
+    ],
+    [
+     174,
+     366
+    ],
+    [
+     18,
+     366
+    ]
+   ],
+   "text": "Mmm delicious",
+   "conf": 0.9
+  },
+  {
+   "bbox": [
+    [
+     18,
+     430
+    ],
+    [
+     342,
+     430
+    ],
+    [
+     342,
+     456
+    ],
+    [
+     18,
+     456
+    ]
+   ],
+   "text": "original sound - tylervit..",
+   "conf": 0.9
+  }
+ ]
+}

@@ -3,3 +3,14 @@ PAPERTRAIL_PORT = ""
 LOGGING_LEVEL = ""
 AWS_ACCESS_KEY_ID = ""
 AWS_SECRET_ACCESS_KEY = ""
+S3_BUCKET = ""
+# Path to adb.exe (Android platform-tools) if it is not on the PATH; only needed for the phone interface
+ADB_PATH = ""
+# Screen reading. OCR_ENGINE is rapidocr (fast, default when installed) or easyocr.
+# Each video is watched for at least DWELL_SECONDS and read at least READS_PER_VIDEO times.
+OCR_ENGINE = ""
+# SCREEN_READER is ocr (default) or ui. With ocr, a phone is only asked for its on-screen text as a
+# backup when OCR finds nothing. With ui the phone is asked first (exact, but about 5 seconds a read).
+SCREEN_READER = ""
+READS_PER_VIDEO = ""
+DWELL_SECONDS = ""

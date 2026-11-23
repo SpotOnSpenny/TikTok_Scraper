@@ -8,3 +8,5 @@ opencv-python-headless
 python-dotenv
 boto3
 easyocr
+rapidocr
+onnxruntime

@@ -18,6 +18,7 @@ from tiktok_scraper.Core.global_vars import monitoring_data
 from tiktok_scraper.Core.selenium_utils import start_webdriver, search_for_ad
 from tiktok_scraper.Core.processing import process_ad, finish_processing
 from tiktok_scraper.Core.logger import start_logging
+from tiktok_scraper.Core import collector
 from tiktok_scraper.Core.collector import find_ad, capture_ad, process_ads
 from tiktok_scraper.Core.impression import ImpressionLog
 from tiktok_scraper.Core.phone import choose_phone
@@ -62,6 +63,7 @@ def scrape_tiktok(interface="web"):
 
     # Load the environment variables
     load_dotenv()
+    collector.configure_from_environment()
 
     # Check for output dirs and create them if non_existent
     src_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -171,10 +173,17 @@ def scrape_tiktok(interface="web"):
                 "location": vpn,
                 "network": network,
                 "collector_commit": current_commit(src_dir),
+                "screen_reader": collector.SCREEN_READER,
+                "ocr_engine": collector.engine_name(),
+                "reads_per_video": collector.READS_PER_VIDEO,
+                "dwell_seconds": collector.DWELL_SECONDS,
                 "device": device_details
             }, file, indent=1)
         impression_log = ImpressionLog(session_dir, session_id, {"demographic": demographic, "location": vpn})
         print("Session folder: " + session_dir)
+        if collector.SCREEN_READER == "ui":
+            print("Taking the on-screen text from the phone first (slow), and reading a screenshot where it gives none.")
+        print(f"Reading the screen with {collector.engine_name()}: at least {collector.READS_PER_VIDEO} reads and {collector.DWELL_SECONDS} seconds per video.")
 
     # Define and start the logging and scraping threads
     try:

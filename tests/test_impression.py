@@ -1,4 +1,5 @@
 # Python Standard Library Dependencies
+import glob
 import json
 import os
 import re
@@ -64,6 +65,33 @@ def test_ordinary_video_is_not_an_ad():
 def test_caption_mentioning_sponsored_is_not_an_ad():
     # Whole-line matching: a long caption containing the word does not reach the cutoff
     assert match_label(synthetic("caption_mentions_sponsored"))[0] is None
+
+
+def test_ad_badge_is_a_label():
+    assert match_label(synthetic("ad_badge_only"), width=459) == ("Ad", 100, "Ad")
+    assert match_label(synthetic("ad_badge_only")) == ("Ad", 100, "Ad")
+
+
+def test_ad_badge_is_not_part_of_the_caption():
+    text = screen_text(synthetic("ad_badge_only"), width=459)
+    assert "Ad" not in text["lines"]
+    assert text["account"] == "smartechsolution"
+
+
+def test_the_letters_ad_elsewhere_on_screen_are_not_a_badge():
+    assert match_label(synthetic("ad_text_in_video"), width=459)[0] is None
+
+
+@pytest.mark.parametrize("read_as", ["Ad", "AD", "ad", "Ad.", "Ad |", "[Ad]"])
+def test_badge_is_matched_through_small_misreads(read_as):
+    box = [[18, 398], [52, 398], [52, 424], [18, 424]]
+    assert match_label([(box, read_as, 0.8)], width=459)[0] == "Ad"
+
+
+@pytest.mark.parametrize("read_as", ["Add", "#ad", "Ads", "A", "Adam", "bad"])
+def test_badge_needs_an_exact_read(read_as):
+    box = [[18, 398], [52, 398], [52, 424], [18, 424]]
+    assert match_label([(box, read_as, 0.8)], width=459)[0] is None
 
 
 def test_no_text_is_not_an_ad():
@@ -211,6 +239,57 @@ def test_two_videos_from_one_account_are_different():
     second = screen_text(synthetic("same_account_video_2"))
     assert first["account"] == second["account"] == "SharkHomeCanada"
     assert same_video(first, second) is False
+
+
+def test_two_videos_sharing_only_a_sound_credit_are_different():
+    assert same_video(text_of("same_sound_video_1"), text_of("same_sound_video_2")) is False
+
+
+def test_a_video_with_only_a_sound_credit_is_compared_on_it():
+    assert same_video(text_of("sound_credit_only"), text_of("sound_credit_only")) is True
+    assert same_video(text_of("sound_credit_only"), text_of("ordinary_a")) is False
+
+
+# ------------------------------ frames from real phone runs ------------------------------
+# Session frames turned into fixtures with tools/make_fixtures.py image, kept in tests/fixtures/local,
+# which git ignores because the frames show other people's videos. Each folder holds one frame per
+# counted video, in order, and may hold ads.txt: the frame names (one per line) that are ads.
+
+LOCAL_SESSIONS = sorted(glob.glob(os.path.join(FIXTURE_DIR, "local", "*", "")))
+
+
+def local_frames(session):
+    frames = {}
+    for path in sorted(glob.glob(os.path.join(session, "*.json"))):
+        with open(path, encoding="utf-8") as file:
+            data = json.load(file)
+        frames[os.path.splitext(os.path.basename(path))[0]] = (
+            [(d["bbox"], d["text"], d["conf"]) for d in data["detections"]], data["crop_size"][0], data["crop_size"][1]
+        )
+    return frames
+
+
+@pytest.mark.skipif(not LOCAL_SESSIONS, reason="no local phone fixtures")
+@pytest.mark.parametrize("session", LOCAL_SESSIONS)
+def test_phone_session_ads_are_flagged_and_nothing_else(session):
+    listing = os.path.join(session, "ads.txt")
+    if not os.path.exists(listing):
+        pytest.skip("no ads.txt for this session")
+    with open(listing, encoding="utf-8") as file:
+        expected = {line.strip() for line in file if line.strip()}
+    frames = local_frames(session)
+    flagged = {name for name, (results, width, _) in frames.items() if match_label(results, width=width)[0] is not None}
+    assert flagged == expected
+
+
+@pytest.mark.skipif(not LOCAL_SESSIONS, reason="no local phone fixtures")
+@pytest.mark.parametrize("session", LOCAL_SESSIONS)
+def test_phone_session_consecutive_videos_are_different(session):
+    frames = local_frames(session)
+    texts = {name: screen_text(results, height=height, width=width) for name, (results, width, height) in frames.items()}
+    names = sorted(texts)
+    wrong = [(first, second) for first, second in zip(names, names[1:]) if same_video(texts[first], texts[second]) is True]
+    assert wrong == []
 
 
 @needs_s3
