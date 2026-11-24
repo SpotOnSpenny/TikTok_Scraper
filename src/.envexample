@@ -12,7 +12,11 @@ OCR_ENGINE = ""
 # SCREEN_READER is ocr (default) or ui. With ocr, a phone is only asked for its on-screen text as a
 # backup when OCR finds nothing. With ui the phone is asked first (exact, but about 5 seconds a read).
 SCREEN_READER = ""
+# Processor threads the fast OCR engine may use (default 4; more was slower on the test laptop)
+OCR_THREADS = ""
 READS_PER_VIDEO = ""
 DWELL_SECONDS = ""
 # Set UPLOAD_ADS to 0 for test runs: recorded ads stay in the session folder and are not sent to S3.
 UPLOAD_ADS = ""
+# The phone's screen is watched as live video. Set PHONE_STREAM to 0 to use screenshots instead (slower).
+PHONE_STREAM = ""

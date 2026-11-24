@@ -92,7 +92,7 @@ def rows(log):
 def test_counts_videos_not_swipes(device, monkeypatch, tmp_path):
     log = ImpressionLog(str(tmp_path), "session", {"demographic": "6M", "location": "calgary"})
     # Video A, a failed swipe (A read again), video B, then an ad
-    play(monkeypatch, ["ordinary_a", "ordinary_a_reread", "ordinary_b", "ad_sponsored"])
+    play(monkeypatch, ["ordinary_a", "ordinary_a_reread", "ordinary_a", "ordinary_b", "ad_sponsored"])
     collector.find_ad(device, log)
 
     assert collector.monitoring_data["videos_watched"] == 3
@@ -114,7 +114,7 @@ def test_ad_is_not_captured_twice_when_the_swipe_after_it_fails(device, monkeypa
     clock = iter(range(0, 100000, 7))
     monkeypatch.setattr(collector.time, "time", lambda: float(next(clock)))
 
-    play(monkeypatch, ["ad_sponsored", "ad_sponsored_noisy", "ordinary_b", "ad_promoted_music"])
+    play(monkeypatch, ["ad_sponsored", "ad_sponsored_noisy", "ad_sponsored", "ordinary_b", "ad_promoted_music"])
     collector.find_ad(device, log)
     collector.capture_ad(device, str(output_dir), mock.MagicMock(), job_queue, log)
     # The swipe after the capture fails once: the same ad is read again, then B, then a second ad
@@ -165,7 +165,8 @@ def test_label_appearing_after_a_failed_swipe_is_still_captured(device, monkeypa
 def test_stuck_feed_is_refreshed_after_repeated_failed_swipes(device, monkeypatch, tmp_path):
     log = ImpressionLog(str(tmp_path), "session")
     # The same screen for eleven reads, then the feed moves on to an ad
-    play(monkeypatch, ["ordinary_a"] * 11 + ["ad_sponsored"])
+    # Each failed swipe is two looks at the unchanged screen
+    play(monkeypatch, ["ordinary_a"] * 21 + ["ad_sponsored"])
     collector.find_ad(device, log)
 
     assert collector.monitoring_data["videos_watched"] == 2
@@ -173,14 +174,14 @@ def test_stuck_feed_is_refreshed_after_repeated_failed_swipes(device, monkeypatc
     written = rows(log)
     assert written[0]["swipe_attempts"] == 11
     assert written[0]["stuck_refreshes"] == 2
-    assert written[0]["reads"] == 11
+    assert written[0]["reads"] == 21
 
 
 def test_housekeeping_runs_once_per_counted_video(device, monkeypatch, tmp_path):
     log = ImpressionLog(str(tmp_path), "session")
     monkeypatch.setitem(collector.monitoring_data, "videos_watched", 24)
     # The 25th video's swipe fails twice before the feed moves on
-    play(monkeypatch, ["ordinary_a", "ordinary_a", "ordinary_a_reread", "ordinary_b", "ad_sponsored"])
+    play(monkeypatch, ["ordinary_a", "ordinary_a", "ordinary_a_reread", "ordinary_a", "ordinary_a_reread", "ordinary_b", "ad_sponsored"])
     collector.find_ad(device, log)
 
     assert collector.monitoring_data["videos_watched"] == 27
@@ -283,9 +284,9 @@ def test_with_no_dwell_a_video_is_left_as_soon_as_its_reads_are_done(device, clo
     play_timed(monkeypatch, clock, ["ordinary_a", "ordinary_a", "ordinary_b", "ordinary_b", "ad_sponsored"])
     collector.find_ad(device, log)
 
-    # Second video: 1 s to settle, two 1 s reads and the 0.3 s gap between them
+    # Second video: 0.3 s to settle, two 1 s reads and the 0.3 s gap between them
     assert rows(log)[1]["reads"] == 2
-    assert rows(log)[1]["dwell_s"] == pytest.approx(3.3)
+    assert rows(log)[1]["dwell_s"] == pytest.approx(2.6)
 
 
 def test_watch_time_can_depend_on_the_video(device, clock, monkeypatch, tmp_path):
@@ -325,7 +326,7 @@ def test_text_from_a_later_read_replaces_an_empty_first_read(device, clock, monk
 
 # ----------------------------------- OCR engine size -----------------------------------
 
-def test_fast_engine_is_given_a_double_size_region_and_positions_are_scaled_back(device, monkeypatch):
+def test_fast_engine_reads_a_phone_at_stored_size_and_an_emulator_enlarged(device, monkeypatch):
     seen = []
 
     def read(region):
@@ -333,21 +334,34 @@ def test_fast_engine_is_given_a_double_size_region_and_positions_are_scaled_back
         return [([[40, 200], [240, 200], [240, 260], [40, 260]], "Sponsored", 0.99)]
     monkeypatch.setattr(collector, "_engine", ("rapidocr", read))
 
-    # A phone screenshot is used at its own resolution
+    # A phone screenshot is brought down to stored size and read as it is
     device.size = (1080, 2400)
     reading = collector.read_screen(device)
-    assert seen[-1] == (1200, 918, 3)
+    assert seen[-1] == (600, 459, 3)
     assert reading["image"].shape == (1200, 540, 3)
     assert (reading["region_width"], reading["region_height"]) == (459, 600)
-    assert reading["results"][0][0] == [[20, 100], [120, 100], [120, 130], [20, 130]]
+    assert reading["results"][0][0] == [[40, 200], [240, 200], [240, 260], [40, 260]]
     assert reading["source"] == "rapidocr"
 
-    # An emulator frame is enlarged for the engine
+    # An emulator frame is enlarged for the engine, and positions are scaled back
     device.size = (540, 960)
     reading = collector.read_screen(device)
     assert seen[-1] == (960, 918, 3)
     assert reading["image"].shape == (960, 540, 3)
     assert reading["region_height"] == 480
+    assert reading["results"][0][0] == [[20, 100], [120, 100], [120, 130], [20, 130]]
+
+
+def test_a_swipe_is_only_repeated_after_a_second_look(device, clock, monkeypatch, tmp_path):
+    monkeypatch.setattr(collector, "READS_PER_VIDEO", 1)
+    log = ImpressionLog(str(tmp_path), "session")
+    # The first look after the swipe catches the old video on its way out; the second shows the new one
+    play_timed(monkeypatch, clock, ["ordinary_a", "ordinary_a_reread", "ordinary_b", "ad_sponsored"])
+    collector.find_ad(device, log)
+
+    assert device.swipes == 2
+    assert collector.monitoring_data["videos_watched"] == 3
+    assert [row["swipe_attempts"] for row in rows(log)] == [1, 1]
 
 
 # ------------------------------ text straight from the phone ------------------------------
@@ -436,7 +450,7 @@ def test_ui_reader_falls_back_to_ocr_when_the_phone_gives_nothing(ui_reader, mon
 
 def test_ui_reader_sees_a_failed_swipe(ui_reader, monkeypatch, tmp_path):
     same = ui_video("Shayne Vibes Truth", "#greenscreenvideo #greenscreen", "original sound - shayne.vibes31")
-    phone = UiDevice([same, same, ui_video("coachdan", "Three drills every winger should know", "original sound - coachdan", badge=True)])
+    phone = UiDevice([same, same, same, ui_video("coachdan", "Three drills every winger should know", "original sound - coachdan", badge=True)])
     log = ImpressionLog(str(tmp_path), "session")
     collector.find_ad(phone, log)
 

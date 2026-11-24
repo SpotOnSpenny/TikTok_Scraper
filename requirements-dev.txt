@@ -11,3 +11,5 @@ easyocr
 rapidocr-onnxruntime==1.4.4; python_version < "3.13"
 rapidocr; python_version >= "3.13"
 onnxruntime
+
+av

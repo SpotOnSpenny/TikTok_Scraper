@@ -113,7 +113,7 @@ def test_lines_are_ordered_top_to_bottom():
 
 
 def test_low_confidence_text_is_dropped():
-    assert text_of("low_confidence_only") == {"account": "", "caption": "", "lines": []}
+    assert text_of("low_confidence_only") == {"account": "", "caption": "", "lines": [], "identifying": []}
 
 
 def test_nav_bar_is_dropped_but_a_lookalike_account_is_kept():
@@ -239,6 +239,25 @@ def test_two_videos_from_one_account_are_different():
     second = screen_text(synthetic("same_account_video_2"))
     assert first["account"] == second["account"] == "SharkHomeCanada"
     assert same_video(first, second) is False
+
+
+def test_a_scrolling_sound_line_does_not_make_one_video_look_like_two():
+    # Two reads of one video: only the piece of the scrolling sound line that was caught differs
+    def read(sound):
+        box = lambda top, text: ([[20, top], [20 + 11 * len(text), top], [20 + 11 * len(text), top + 26], [20, top + 26]], text, 0.9)
+        return screen_text([box(300, "CENZY"), box(410, sound)], height=570, width=459)
+    first, second = read("riginal sound - kjlyrics - K"), read("und - kjlyrics - KJLYRICS")
+    assert first["identifying"] == second["identifying"] == ["cenzy"]
+    assert same_video(first, second) is True
+
+
+def test_a_video_of_many_short_text_pieces_is_recognised():
+    pieces = ["G-SK", "FLAMINGO", "GitchSportswear", "Toronto", "giveaway", "1.FOLLOW", "2.COMMENT", "ANYG"]
+    first = {"lines": pieces + ["OMMENTYOURPI", "weekivHatTTHEYWANT"]}
+    second = {"lines": pieces + ["AMMENTYOURPI"]}
+    other = {"lines": ["Toronto", "giveaway", "Raptors", "tickets", "tonight", "win big"]}
+    assert same_video(first, second) is True
+    assert same_video(first, other) is False
 
 
 def test_two_videos_sharing_only_a_sound_credit_are_different():

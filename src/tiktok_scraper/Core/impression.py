@@ -39,7 +39,7 @@ READ_WIDTH_SHARE = 0.85
 # An exact match is dropped anywhere. A near match (OCR slips such as "Homes") is dropped only in
 # the bottom strip of the read region, where the navigation bar sits, so that an account called
 # "Homer" higher up is kept.
-SCREEN_CHROME = ["Home", "Friends", "Inbox", "Profile", "See more"]
+SCREEN_CHROME = ["Home", "Friends", "Inbox", "Profile", "See more", "+"]
 CHROME_CUTOFF = 80
 NAV_BAR_START = 0.85
 # Two reads are the same video when their whole text is at least this similar...
@@ -55,6 +55,15 @@ SHARED_LINES_MIN_TOTAL = 30
 # The sound credit under the caption, which is the same for every video from one account
 SOUND_CREDIT = "original sound"
 SOUND_CREDIT_CUTOFF = 85
+# The sound credit scrolls sideways, so each read catches a different piece of it ("und - kjlyrics -
+# KJLYRICS", then "riginal sound - kjlyrics - K"). It is the lowest line of text above the navigation
+# bar, so the lowest line is also left out of the comparison when it sits below this share of the
+# read region's height. On an ad with a button, that lowest line is the button, which is no loss.
+LOWEST_LINE_START = 0.6
+# ...or, for a video whose text is many short pieces (text drawn on the video itself), when at least
+# this many lines of 4 or more characters, and this share of them on both sides, are the same.
+SHARED_LINES_MIN_COUNT = 3
+SHARED_LINES_MIN_SHARE = 0.6
 
 
 def read_region(image):
@@ -128,16 +137,26 @@ def screen_text(results, height=None, flags=SPONSORED_FLAGS, cutoff=LABEL_CUTOFF
         kept.append((top, left, text))
     kept.sort()
     lines = [text for _, _, text in kept]
+    # The lines that say which video this is: everything but the sound credit, which is the same for
+    # every video from one account and reads differently each time because it scrolls
+    identifying = [
+        text.lower() for position, (top, _, text) in enumerate(kept)
+        if fuzz.partial_ratio(text.lower(), SOUND_CREDIT) < SOUND_CREDIT_CUTOFF
+        and not (height and len(kept) > 1 and position == len(kept) - 1 and top >= height * LOWEST_LINE_START)
+    ]
     return {
         "account": lines[0] if lines else "",
         "caption": " ".join(lines[1:]),
-        "lines": lines
+        "lines": lines,
+        "identifying": identifying
     }
 
 
 def identifying_lines(text):
-    # The lines that say which video this is. The sound credit ("original sound - account") is left
-    # out: every video from one account carries the same one, so it would make them all look alike.
+    # As worked out by screen_text; for text put together some other way, everything but a line
+    # that reads as a sound credit
+    if "identifying" in text:
+        return text["identifying"]
     return [
         line.lower() for line in text["lines"]
         if fuzz.partial_ratio(line.lower(), SOUND_CREDIT) < SOUND_CREDIT_CUTOFF
@@ -167,7 +186,19 @@ def same_video(previous, current, threshold=SAME_VIDEO_THRESHOLD):
         len(previous_line) for previous_line in previous_long
         if any(fuzz.ratio(previous_line, current_line) >= SHARED_LINE_CUTOFF for current_line in current_long)
     )
-    return shared_characters >= SHARED_LINES_MIN_TOTAL
+    if shared_characters >= SHARED_LINES_MIN_TOTAL:
+        return True
+    previous_pieces = [line for line in previous_lines if len(line) >= 4]
+    current_pieces = [line for line in current_lines if len(line) >= 4]
+    if not previous_pieces or not current_pieces:
+        return False
+    shared_previous = sum(any(fuzz.ratio(a, b) >= SHARED_LINE_CUTOFF for b in current_pieces) for a in previous_pieces)
+    shared_current = sum(any(fuzz.ratio(a, b) >= SHARED_LINE_CUTOFF for b in previous_pieces) for a in current_pieces)
+    return (
+        min(shared_previous, shared_current) >= SHARED_LINES_MIN_COUNT
+        and shared_previous / len(previous_pieces) >= SHARED_LINES_MIN_SHARE
+        and shared_current / len(current_pieces) >= SHARED_LINES_MIN_SHARE
+    )
 
 
 def iso_time(timestamp):

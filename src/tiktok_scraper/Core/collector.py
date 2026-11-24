@@ -36,8 +36,15 @@ AD_CAPTURE_SECONDS = 20
 # Stored frames are brought to this width, so a phone's 1080-wide screen and the 540-wide emulator
 # give frames, text positions and thresholds on the same scale
 FRAME_WIDTH = 540
-# Seconds to wait after a swipe before the first read, for the next video to settle
-SETTLE_SECONDS = 1
+# Seconds to wait after a swipe before the first read. On the test phone (2026-11-24) the next
+# video's text was already on screen the moment the swipe command returned, in 60 swipes out of 60,
+# and the previous video was never still showing; a short pause is kept so the stored frame is not
+# caught mid-slide.
+SETTLE_SECONDS = 0.3
+# If the first read after a swipe still looks like the same video, wait this long and look once more
+# before swiping again, in case the read caught the old video on its way out. Swiping twice by
+# mistake would skip a video unseen.
+CONFIRM_SECONDS = 0.7
 # Seconds between reads of the same video
 REREAD_GAP_SECONDS = 0.3
 
@@ -51,11 +58,11 @@ READS_PER_VIDEO = 2
 
 # Which OCR engine reads the screen: "rapidocr" (fast) or "easyocr" (slow, the original). With
 # OCR_ENGINE unset, RapidOCR is used when it is installed and EasyOCR otherwise.
-# OCR_SCALE is how much larger than a stored frame the image given to the engine is. RapidOCR is
-# given a phone's screenshot at its own resolution, not the stored half-size frame. On enlarged
-# fixture frames (2026-11-23) the older rapidocr-onnxruntime package read more labels at double
-# size (115 of 120 against 111); the newer rapidocr package read the same either way.
-OCR_SCALE = {"rapidocr": 2, "easyocr": 1}
+# A frame no wider than a stored frame (an emulator window) is enlarged by this much for RapidOCR,
+# which read more labels that way on small emulator frames. A phone's screenshot is not: it is
+# brought down to stored-frame size first, where on 201 phone frames (2026-11-24) the engine read
+# every ad badge exactly as it did at full size, in less time.
+SMALL_FRAME_OCR_SCALE = {"rapidocr": 2}
 
 # How the screen is read. "ocr" (the default) reads a screenshot, and when that finds no text at all
 # on a phone it asks the phone for the text on screen as a backup. "ui" asks the phone first and uses
@@ -134,10 +141,26 @@ def crashes_in_a_separate_process(loader_name):
     return f"stopped with exit code {result.returncode} ({last_line})"
 
 
+def ocr_threads():
+    # How many processor threads RapidOCR may use. Left to itself it takes every core, and on the
+    # 12-core test laptop that was the slowest choice: a read took 1.24 s on all cores, 0.69 s on 2,
+    # 0.51 s on 4, 0.56 s on 6 and 0.61 s on 8 (291 phone frames, 2026-11-24), with the same ads found
+    # each time. Four also leaves cores free for anything running beside it. OCR_THREADS in src/.env
+    # changes it.
+    try:
+        return max(1, int(os.environ.get("OCR_THREADS") or 4))
+    except ValueError:
+        return 4
+
+
 def load_rapidocr_package():
     # The newer package; it downloads its model files the first time it is used
     from rapidocr import RapidOCR
-    engine = RapidOCR()
+    try:
+        # No check of which way up each line is (text on a phone screen is upright), and a thread limit
+        engine = RapidOCR(params={"Global.use_cls": False, "EngineConfig.onnxruntime.intra_op_num_threads": ocr_threads()})
+    except Exception:
+        engine = RapidOCR()
 
     def read(image):
         output = engine(image)
@@ -148,9 +171,11 @@ def load_rapidocr_package():
 
 
 def load_rapidocr_onnxruntime_package():
-    # The older package; its model files come with it, so it needs no download
+    # The older package; its model files come with it, so it needs no download.
+    # No check of which way up each line is (text on a phone screen is upright), and a thread limit.
+    # The size it looks for text at is left alone: at smaller sizes it was quicker but missed an ad badge.
     from rapidocr_onnxruntime import RapidOCR
-    engine = RapidOCR()
+    engine = RapidOCR(use_cls=False, intra_op_num_threads=ocr_threads())
 
     def read(image):
         result, _ = engine(image)
@@ -233,18 +258,17 @@ def read_screen(device):
     # without the right-hand count rail. The colour image is read as it is: on the S3 ad frames an
     # Otsu threshold lost the label in about a third of frames, and the left half alone cut the captions short.
     ocr_start = time.perf_counter()
-    scale = OCR_SCALE.get(engine_name(), 1)
+    region = read_region(image)
+    small_frame = original.shape[1] <= FRAME_WIDTH * 1.1
+    scale = SMALL_FRAME_OCR_SCALE.get(engine_name(), 1) if small_frame else 1
     if scale == 1:
-        region = read_region(image)
         results = ocr(region)
     else:
-        # A phone's screenshot already has the extra detail; an emulator's is enlarged
-        large = read_region(normalise_frame(original, FRAME_WIDTH * scale))
+        large = cv2.resize(region, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
         results = [
             ([[point[0] / scale, point[1] / scale] for point in box], text, confidence)
             for box, text, confidence in ocr(large)
         ]
-        region = read_region(image)
     reading = {
         "results": results, "region_width": region.shape[1], "region_height": region.shape[0],
         "read_ms": round((time.perf_counter() - ocr_start) * 1000, 1), "source": engine_name(), "image": image
@@ -307,6 +331,7 @@ def find_ad(device, impression_log, stop_at=None):
     # returned without swiping, so a session ends on time even if no ad comes.
     global monitoring_data
     just_swiped = True
+    looked_twice = False
     while True:
         # After a swipe give the next video a moment to settle; between reads of one video, a short gap
         time.sleep(SETTLE_SECONDS if just_swiped else REREAD_GAP_SECONDS)
@@ -338,12 +363,19 @@ def find_ad(device, impression_log, stop_at=None):
                 impression_log.mark_ad(flag, score, matched_text)
                 return True
             if impression_log.swipe_count() > 0:
-                # The text on screen has not changed, so the last swipe did not advance. Swipe again without counting.
+                if not looked_twice:
+                    # The text has not changed since the swipe. Look once more before deciding it failed.
+                    looked_twice = True
+                    time.sleep(CONFIRM_SECONDS)
+                    continue
+                # Still the same on a second look, so the last swipe did not advance. Swipe again without counting.
                 print("Swipe not confirmed at index: " + str(monitoring_data["data_index"]) + ", swiping again")
                 leave_video(device, impression_log)
                 just_swiped = True
+                looked_twice = False
                 continue
         else:
+            looked_twice = False
             # A new video: write the row for the one just left, count this one and store its frame.
             # A read with no text is still counted, but flagged, since nothing shows that the video changed.
             # This video came on screen when the previous one was swiped away, not when it was first read

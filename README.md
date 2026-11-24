@@ -205,7 +205,9 @@ All of these go in `src/.env`. Empty means the default.
 | `READS_PER_VIDEO` | `2` | How many times each video is read before it is swiped away. A second read catches an ad label that appeared late or was misread |
 | `DWELL_SECONDS` | `5` | The least time each video stays on screen. `0` swipes as soon as the reads are done |
 | `OCR_ENGINE` | automatic | The program that reads text from the screenshot. The collector uses the fast one (RapidOCR) when it works on the computer and the slower one (EasyOCR) when it does not. Set `rapidocr` or `easyocr` only to force one |
+| `OCR_THREADS` | `4` | Processor threads the fast OCR engine may use. More is not faster: on a 12-core laptop a read took 0.5 s on 4 threads and 1.2 s on all of them |
 | `SCREEN_READER` | `ocr` | `ocr` reads a screenshot and asks the phone for its on-screen text only when the screenshot shows nothing. `ui` asks the phone first, which is exact but takes about 5 seconds a read |
+| `PHONE_STREAM` | on | The phone's screen is watched as live video, which is much quicker than asking for a screenshot at every read. `0` uses screenshots. Screenshots are also used automatically if the live video cannot start |
 | `UPLOAD_ADS` | on | `0` keeps recorded ads in the session folder and uploads nothing. For test runs |
 
 ## Troubleshooting

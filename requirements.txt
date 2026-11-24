@@ -16,6 +16,8 @@ python-Levenshtein
 rapidocr-onnxruntime==1.4.4; python_version < "3.13"
 rapidocr; python_version >= "3.13"
 onnxruntime
+# Decodes the phone's live video (optional: without it the collector uses screenshots)
+av
 # Slower OCR engine, used automatically when the fast one cannot start
 easyocr
 
