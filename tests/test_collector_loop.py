@@ -522,3 +522,66 @@ def test_easyocr_is_used_quietly_about_crashes_when_the_fast_engine_is_not_insta
 
     assert collector.load_engine() == ("easyocr", "easyocr reader")
     assert "is not installed" in capsys.readouterr().out
+
+
+# ----------------------------------- uploads -----------------------------------
+
+@pytest.mark.parametrize("value, expected", [(None, True), ("", True), ("1", True), ("0", False), ("false", False), ("Off", False), (" no ", False)])
+def test_uploads_can_be_switched_off(monkeypatch, value, expected):
+    if value is None:
+        monkeypatch.delenv("UPLOAD_ADS", raising=False)
+    else:
+        monkeypatch.setenv("UPLOAD_ADS", value)
+    assert collector.uploads_enabled() is expected
+
+
+def test_with_uploads_off_the_recording_stays_and_nothing_is_sent(monkeypatch, tmp_path):
+    import queue
+    import sys
+    import threading
+    monkeypatch.setenv("UPLOAD_ADS", "0")
+    boto3 = mock.MagicMock()
+    monkeypatch.setitem(sys.modules, "boto3", boto3)
+    ad_folder = tmp_path / "20261124at120000_0_18M_calgary"
+    ad_folder.mkdir()
+    (ad_folder / "ad.mp4").write_bytes(b"video")
+    (tmp_path / "Data Key.csv").write_text("Ad ID,Demographic,Location,FPS,Found At Index\n")
+    jobs = queue.Queue()
+    jobs.put({"folder_name": ad_folder.name, "found_at_time": "20261124at120000", "found_at_index": 3, "demographic": "18M", "location": "calgary", "video_path": str(ad_folder / "ad.mp4")})
+    stop = threading.Event()
+    monkeypatch.setattr(collector.shutil, "rmtree", mock.Mock(side_effect=AssertionError("the recording must be kept")))
+
+    # Stop the loop once the one job has been handled
+    original_get = jobs.get
+    def get_then_stop(**kwargs):
+        if jobs.empty():
+            stop.set()
+            raise queue.Empty
+        return original_get(**kwargs)
+    monkeypatch.setattr(jobs, "get", get_then_stop)
+    collector.process_ads(stop, threading.Event(), threading.Event(), jobs, str(tmp_path))
+
+    assert not boto3.client.called
+    assert (ad_folder / "ad.mp4").exists()
+    assert "20261124at120000_18M_calgary,18M,calgary" in (tmp_path / "Data Key.csv").read_text()
+
+
+# ----------------------------------- time limit -----------------------------------
+
+def test_find_ad_stops_when_the_time_is_up_without_waiting_for_an_ad(device, clock, monkeypatch, tmp_path):
+    log = ImpressionLog(str(tmp_path), "session")
+    play_timed(monkeypatch, clock, ["ordinary_a", "ordinary_a", "ordinary_b", "ordinary_b"] + ["ad_sponsored"] * 5)
+    # Time runs out during the second video
+    found = collector.find_ad(device, log, stop_at=clock.now + 5)
+
+    assert found is False
+    assert collector.monitoring_data["videos_watched"] == 2
+    # The video on screen was finished but not swiped away, and is still open for the closing row
+    assert device.swipes == 1
+    assert log.has_open() and not log.is_ad()
+
+
+def test_find_ad_reports_an_ad_found_before_the_time_is_up(device, clock, monkeypatch, tmp_path):
+    log = ImpressionLog(str(tmp_path), "session")
+    play_timed(monkeypatch, clock, ["ad_sponsored"])
+    assert collector.find_ad(device, log, stop_at=clock.now + 3600) is True

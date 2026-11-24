@@ -301,8 +301,10 @@ def leave_video(device, impression_log):
         time.sleep(10)
 
 
-def find_ad(device, impression_log):
-    # Watches videos, swiping past the ones that are not ads, and returns when an ad is on screen
+def find_ad(device, impression_log, stop_at=None):
+    # Watches videos, swiping past the ones that are not ads. Returns True when an ad is on screen.
+    # stop_at is a time.time() value: once it has passed, the video on screen is finished and False is
+    # returned without swiping, so a session ends on time even if no ad comes.
     global monitoring_data
     just_swiped = True
     while True:
@@ -334,7 +336,7 @@ def find_ad(device, impression_log):
                 # the first time, or a swipe was wrongly judged to have failed. An ad is showing.
                 print("Ad found on a later read at index: " + str(monitoring_data["data_index"]))
                 impression_log.mark_ad(flag, score, matched_text)
-                return
+                return True
             if impression_log.swipe_count() > 0:
                 # The text on screen has not changed, so the last swipe did not advance. Swipe again without counting.
                 print("Swipe not confirmed at index: " + str(monitoring_data["data_index"]) + ", swiping again")
@@ -357,11 +359,13 @@ def find_ad(device, impression_log):
             impression_log.open(shown_at, text, flag, score, matched_text, reading["read_ms"], scoring_ms, frame_path, advance_confirmed=len(text["lines"]) > 0, first_read_at=read_started, text_source=reading["source"])
             if flag is not None:
                 print("Ad found at index: " + str(monitoring_data["data_index"]))
-                return
+                return True
 
         # Not an ad so far. Keep watching until the video has had its time and its reads, then move on.
         watched = time.time() - impression_log.shown_time()
         if impression_log.read_count() >= READS_PER_VIDEO and watched >= watch_seconds(impression_log.current_text()):
+            if stop_at is not None and time.time() >= stop_at:
+                return False
             print(f"No ad found at index: {monitoring_data['data_index']} ({impression_log.read_count()} reads, {round(watched, 1)}s)")
             leave_video(device, impression_log)
             just_swiped = True
@@ -398,6 +402,12 @@ def capture_ad(device, output_dir, data_lock, job_queue, impression_log):
         quit(1)
 
 
+def uploads_enabled():
+    # UPLOAD_ADS=0 (or false/no/off) in src/.env keeps recorded ads on this computer and out of S3,
+    # for test runs. Anything else, or nothing, uploads as normal.
+    return (os.environ.get("UPLOAD_ADS") or "").strip().lower() not in ["0", "false", "no", "off"]
+
+
 # TODO we need to process this later for things like the Caption text and the length
 def process_ads(stop_event, error_event, keystroke_event, job_queue, output_dir):
     while not stop_event.is_set() and not error_event.is_set() and not keystroke_event.is_set():
@@ -412,11 +422,12 @@ def process_ads(stop_event, error_event, keystroke_event, job_queue, output_dir)
                 # The device saved numbered screenshots that need stitching
                 from tiktok_scraper.Core.processing import stitch_video
                 video_path = stitch_video(ad_folder, ad_info["fps"], ad_id)
-            # Upload the video to S3
-            import boto3
             import pandas
-            s3_client = boto3.client('s3')
-            s3_client.upload_file(video_path, os.environ.get("S3_BUCKET"), f"{ad_id}.mp4")
+            if uploads_enabled():
+                # Upload the video to S3
+                import boto3
+                s3_client = boto3.client('s3')
+                s3_client.upload_file(video_path, os.environ.get("S3_BUCKET") or os.environ.get("S3_Bucket"), f"{ad_id}.mp4")
             pandas.DataFrame({
                 "Ad ID": [ad_id],
                 "Demographic": [ad_info["demographic"]],
@@ -424,8 +435,11 @@ def process_ads(stop_event, error_event, keystroke_event, job_queue, output_dir)
                 "FPS": [ad_info.get("fps")],
                 "Found At Index": [ad_info["found_at_index"]]
             }).to_csv(os.path.join(output_dir, "Data Key.csv"), mode='a', header=False, index=False)
-            print(f"Ad {ad_id} processed and uploaded to S3. Removing it from the disk.")
-            shutil.rmtree(ad_folder)
+            if uploads_enabled():
+                print(f"Ad {ad_id} processed and uploaded to S3. Removing it from the disk.")
+                shutil.rmtree(ad_folder)
+            else:
+                print(f"Ad {ad_id} processed. Uploads are switched off, so it stays in {ad_folder}.")
 
         except queue.Empty:
             continue

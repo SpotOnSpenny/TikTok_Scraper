@@ -176,11 +176,14 @@ def scrape_tiktok(interface="web"):
                 "screen_reader": collector.SCREEN_READER,
                 "ocr_engine": collector.engine_name(),
                 "reads_per_video": collector.READS_PER_VIDEO,
+                "uploads": collector.uploads_enabled(),
                 "dwell_seconds": collector.DWELL_SECONDS,
                 "device": device_details
             }, file, indent=1)
         impression_log = ImpressionLog(session_dir, session_id, {"demographic": demographic, "location": vpn})
         print("Session folder: " + session_dir)
+        if not collector.uploads_enabled():
+            print("Test mode: recorded ads are kept in the session folder and NOT uploaded to S3 (UPLOAD_ADS is off).")
         if collector.SCREEN_READER == "ui":
             print("Taking the on-screen text from the phone first (slow), and reading a screenshot where it gives none.")
         print(f"Reading the screen with {collector.engine_name()}: at least {collector.READS_PER_VIDEO} reads and {collector.DWELL_SECONDS} seconds per video.")
@@ -215,8 +218,9 @@ def scrape_tiktok(interface="web"):
                 search_for_ad(driver)
                 process_ad(driver, output_dir, data_lock, processing_queue)
             else:
-                find_ad(device, impression_log)
-                capture_ad(device, session_dir, data_lock, processing_queue, impression_log)
+                # find_ad comes back without an ad when the time is up
+                if find_ad(device, impression_log, stop_at=end_time.timestamp()):
+                    capture_ad(device, session_dir, data_lock, processing_queue, impression_log)
     except KeyboardInterrupt:
         print("Keyboard interrupt detected. Exiting...")
         # Close the last row now, so its end time is the moment of stopping and not when the other threads finish
